@@ -18,12 +18,19 @@
   4. Run unit test
 
 ## Basic Assertions
+Using static methods from `Assertions.class`
 
-* Static methods from `Assertions.class`
+### Equality & Nullity
   - assertEquals()
   - assertNotEquals()
   - assertNull()
   - assertNotNull()
+
+### Identity (Object Reference)
+  - assertSame(), assertNotSame
+
+### Boolean
+  - assertTrue(), assertFalse()
 
 ## Lifecycle Methods
 

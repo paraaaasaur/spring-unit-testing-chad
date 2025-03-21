@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 // No need to use public visibility
-@DisplayNameGeneration(DisplayNameGenerator.Simple.class)
 class DemoUtilsTest {
 
 	DemoUtils demoUtils;
@@ -20,7 +19,7 @@ class DemoUtilsTest {
 	}
 
 	@Test
-//	@DisplayName("Equals and Not Equals")
+	@DisplayName("Equals and Not Equals")
 	void testEqualsAndNotEquals() {
 		// 2. Execute
 		int actualSum1 = demoUtils.add(2, 4);
@@ -43,7 +42,33 @@ class DemoUtilsTest {
 		assertNull(checkValue2, "object should be null");
 	}
 
+	@Test
+	@DisplayName("Same and Not Same")
+	void testSameOrNotSame() {
+		// 2. Execution
+		String academy = demoUtils.getAcademy();
+		String academyDuplicate = demoUtils.getAcademyDuplicate();
+		String str = new String("free2learn Academy");
 
+		// 3. Assertion
+		assertSame(academy, academyDuplicate, "Objects should refer to the same objects");
+		assertNotSame(str, academy, "Objects should refer to different objects");
+	}
+
+	@Test
+	@DisplayName("True and False")
+	void testTrueFalse() {
+		// 1.5. Set up
+		int n1 = 17;
+		int n2 = 13;
+
+		// 2. Execution
+		Boolean greater = demoUtils.isGreater(n1, n2);
+
+		// 3. Assertion
+		assertTrue(greater, "17 > 13 should be true");
+		assertFalse(!greater, "17 > 13 should be false");
+	}
 
 	private static class Archive {
 		@AfterEach
