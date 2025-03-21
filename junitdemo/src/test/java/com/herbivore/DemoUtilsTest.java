@@ -3,6 +3,7 @@ package com.herbivore;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,6 +70,40 @@ class DemoUtilsTest {
 		assertTrue(greater, "17 > 13 should be true");
 		assertFalse(!greater, "17 > 13 should be false");
 	}
+
+	/** Check for element equality of Arrays */
+	@Test
+	@DisplayName("Array Deeply Equal")
+	void testArrayDeeplyEqual() {
+//		String[] expected = {"a", "B", "C"};
+		String[] expected = {"A", "B", "C"};
+		String[] actual = demoUtils.getFirstThreeLettersOfAlphabet();
+
+		assertArrayEquals(expected, actual, "Expected array should be same as actual array");
+	}
+
+	/** Check for element equality of Iterables */
+	@Test
+	@DisplayName("Iterable Equals")
+	void testIterableEquals() {
+//		List<String> expected = List.of("free", "20", "learn");
+		List<String> expected = List.of("free", "2", "learn");
+		List<String> actual = demoUtils.getAcademyInList();
+
+		assertIterableEquals(expected, actual, "Expected iterable should be same as actual iterable");
+	}
+
+	/** Check equality for {@code List<String>} */
+	@Test
+	@DisplayName("Lines Match")
+	void testLinesMatch() {
+//		List<String> expected = List.of("free", "20", "learn");
+		List<String> expected = List.of("free", "2", "learn");
+		List<String> actual = demoUtils.getAcademyInList();
+
+		assertLinesMatch(expected, actual, "Expected iterable should be same as actual iterable");
+	}
+
 
 	private static class Archive {
 		@AfterEach

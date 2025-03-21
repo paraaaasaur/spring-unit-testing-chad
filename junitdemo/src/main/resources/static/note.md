@@ -20,17 +20,19 @@
 ## Basic Assertions
 Using static methods from `Assertions.class`
 
-### Equality & Nullity
-  - assertEquals()
-  - assertNotEquals()
-  - assertNull()
-  - assertNotNull()
+* Equality: assertEquals, assertNotEquals
+* Nullity: assertNull, assertNotNull
 
-### Identity (Object Reference)
-  - assertSame(), assertNotSame
+* Identity (Object Reference): assertSame, assertNotSame
+* Boolean: assertTrue, assertFalse
 
-### Boolean
-  - assertTrue(), assertFalse()
+* Array Deeply Equal: check for equality of nested instances (not reference check)
+  - assertArrayEquals
+* Iterable Deeply Equal: Collection, Map, DirectoryStream, ...
+  - assertIterableEquals
+* Lines Match: Quick check for List<Stream>
+  - assertLinesMatch
+
 
 ## Lifecycle Methods
 
