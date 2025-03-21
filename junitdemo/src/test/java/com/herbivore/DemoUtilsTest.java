@@ -1,6 +1,6 @@
 package com.herbivore;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
 
@@ -9,10 +9,34 @@ import static org.junit.jupiter.api.Assertions.*;
 // No need to use public visibility
 class DemoUtilsTest {
 
+	DemoUtils demoUtils;
+
+	@BeforeEach
+	void setUpBeforeEach() {
+		// 1. Set up
+		System.out.println("@BeforeEach: Something need doing?");
+		demoUtils = new DemoUtils();
+	}
+
+	@AfterEach
+	void tearDownAfterEach() {
+		System.out.println("@AfterEach: Job's done!");
+	}
+
+	@BeforeAll
+	static void beforeAll() {
+		System.out.println("@BeforeAll: Hail, friend!");
+	}
+
+	@AfterAll
+	static void afterAll() {
+		System.out.println("@AfterAll: We shall meet again.");
+	}
+
 	@Test
 	void testEqualsAndNotEquals() {
-		// 1. Set up
-		DemoUtils demoUtils = new DemoUtils();
+
+		System.out.println("Running: testEqualsAndNotEquals");
 
 		// 2. Execute
 		int actualSum1 = demoUtils.add(2, 4);
@@ -25,8 +49,8 @@ class DemoUtilsTest {
 
 	@Test
 	void testNullAndNotNull() {
-		// 1. Set up
-		DemoUtils demoUtils = new DemoUtils();
+
+		System.out.println("Running: testNullAndNotNull");
 
 		// 2. Execute
 		Object checkValue1 = demoUtils.checkNull(LocalDateTime.now());
@@ -36,4 +60,5 @@ class DemoUtilsTest {
 		assertNotNull(checkValue1, "object should not be null");
 		assertNull(checkValue2, "object should be null");
 	}
+
 }

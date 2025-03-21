@@ -25,3 +25,20 @@
   - assertNull()
   - assertNotNull()
 
+## Lifecycle Methods
+
+---
+
+### Common Operations Around Test Methods
+
+* `@BeforeEach`: run before each test
+    - create objects, set up test data...
+* `@AfterEach`: run after each test
+    - release resources, clean up test data...
+
+### One-Time Method
+
+* `@BeforeAll`: Setup before all tests
+    - Database connection, connect to remote server...
+* `@AfterAll`: Clean up after all tests
+    - release db connection, disconnect from remote server...
