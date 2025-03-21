@@ -27,6 +27,7 @@ public class DemoUtils {
 
 	public int add(int a, int b) {
 		return a + b;
+//		return a + b - 4;
 	}
 
 	public int multiply(int a, int b) {
@@ -35,6 +36,7 @@ public class DemoUtils {
 
 	public Object checkNull(Object obj) {
 		return obj;
+//		return null;
 	}
 
 	public Boolean isGreater(int n1, int n2) {
