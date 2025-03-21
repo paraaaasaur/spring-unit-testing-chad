@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 // No need to use public visibility
+@DisplayNameGeneration(DisplayNameGenerator.Simple.class)
 class DemoUtilsTest {
 
 	DemoUtils demoUtils;
@@ -18,26 +19,9 @@ class DemoUtilsTest {
 		demoUtils = new DemoUtils();
 	}
 
-	@AfterEach
-	void tearDownAfterEach() {
-		System.out.println("@AfterEach: Job's done!");
-	}
-
-	@BeforeAll
-	static void beforeAll() {
-		System.out.println("@BeforeAll: Hail, friend!");
-	}
-
-	@AfterAll
-	static void afterAll() {
-		System.out.println("@AfterAll: We shall meet again.");
-	}
-
 	@Test
+//	@DisplayName("Equals and Not Equals")
 	void testEqualsAndNotEquals() {
-
-		System.out.println("Running: testEqualsAndNotEquals");
-
 		// 2. Execute
 		int actualSum1 = demoUtils.add(2, 4);
 		int actualSum2 = demoUtils.add(1, 9);
@@ -48,10 +32,8 @@ class DemoUtilsTest {
 	}
 
 	@Test
+	@DisplayName("Null and Not Null")
 	void testNullAndNotNull() {
-
-		System.out.println("Running: testNullAndNotNull");
-
 		// 2. Execute
 		Object checkValue1 = demoUtils.checkNull(LocalDateTime.now());
 		Object checkValue2 = demoUtils.checkNull(null);
@@ -61,4 +43,22 @@ class DemoUtilsTest {
 		assertNull(checkValue2, "object should be null");
 	}
 
+
+
+	private static class Archive {
+		@AfterEach
+		void tearDownAfterEach() {
+			System.out.println("@AfterEach: Job's done!");
+		}
+
+		@BeforeAll
+		static void beforeAll() {
+			System.out.println("@BeforeAll: Hail, friend!");
+		}
+
+		@AfterAll
+		static void afterAll() {
+			System.out.println("@AfterAll: We shall meet again.");
+		}
+	}
 }

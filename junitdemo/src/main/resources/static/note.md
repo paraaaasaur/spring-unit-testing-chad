@@ -42,3 +42,16 @@
     - Database connection, connect to remote server...
 * `@AfterAll`: Clean up after all tests
     - release db connection, disconnect from remote server...
+
+
+## Create Display Method
+
+* To be more descriptive than the raw method name
+* To include spaces/emojis/special characters 
+  - e.g. Test for Equality to support JIRA #123
+* Easier for non-techies members to understand
+
+* `@DisplayName`
+* `@DisplayNameGeneration`: Auto generates display name using: 
+  - Simple, DisplayUnderscores, IndicativeSentences
+  - JUnit doesn't provide a built-in generator for camel case (DIY if you wish)
