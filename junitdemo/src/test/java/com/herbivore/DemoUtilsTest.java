@@ -10,6 +10,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 // No need to use public visibility
+//@TestMethodOrder(MethodOrderer.DisplayName.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DemoUtilsTest {
 
 	DemoUtils demoUtils;
@@ -47,6 +49,7 @@ class DemoUtilsTest {
 
 	@Test
 	@DisplayName("Same and Not Same")
+	@Order(-10)
 	void testSameOrNotSame() {
 		// 2. Execution
 		String academy = demoUtils.getAcademy();
@@ -60,6 +63,7 @@ class DemoUtilsTest {
 
 	@Test
 	@DisplayName("True and False")
+	@Order(-100)
 	void testTrueFalse() {
 		// 1.5. Set up
 		int n1 = 17;
