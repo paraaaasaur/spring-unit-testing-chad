@@ -1,7 +1,9 @@
 package com.herbivore;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.function.Executable;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -104,6 +106,27 @@ class DemoUtilsTest {
 		assertLinesMatch(expected, actual, "Expected iterable should be same as actual iterable");
 	}
 
+	@Test
+	@DisplayName("Throws and Does Not Throw")
+	void testThrowsAndDoesNotThrow() {
+		Executable good = () -> demoUtils.throwException(1);
+		Executable bad = () -> demoUtils.throwException(-1);
+
+//		assertThrows(StackOverflowError.class, executable, "Should throw an StackOverflowError");
+		assertThrows(Exception.class, bad, "Should throw an exception");
+		assertDoesNotThrow(good, "Should not throw an exception");
+	}
+
+	@Test
+	@DisplayName("Timeout")
+	void testTimeout() {
+		// this sleeps for 2000 ms
+		Executable exe = () -> demoUtils.checkTimeout();
+
+//		assertTimeoutPreemptively(Duration.ofMillis(1000L), exe);
+//		assertTimeout(Duration.ofMillis(1000L), exe);
+		assertTimeoutPreemptively(Duration.ofMillis(2100L), exe);
+	}
 
 	private static class Archive {
 		@AfterEach

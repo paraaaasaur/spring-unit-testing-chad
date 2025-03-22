@@ -33,6 +33,11 @@ Using static methods from `Assertions.class`
 * Lines Match: Quick check for List<Stream>
   - assertLinesMatch
 
+* Throws: assertThrow
+* Timeout: 
+  - `assertTimeout`: test timeout 
+  - `assertTimeoutPreemptively`: test timeout, but abort rest of the code execution if timeout 
+
 
 ## Lifecycle Methods
 
