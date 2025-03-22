@@ -89,3 +89,30 @@ Using static methods from `Assertions.class`
     2. Method name (alphabetically): `MethodOrderer.MethodName`
     3. Randomly: `MethodOrderer.Random`
     4. Custom: `MethodOrderer.OrderAnnotation` + `@Order`
+
+## Code Coverage
+
+* Code coverage means "how many lines/methods are called by your tests"
+* In general, the higher the coverage the better
+  - However, 100% is not always attainable
+  - On most teams, 70%~80% is acceptable
+
+<aside>
+‼️
+
+WARNING: Code coverage is only a metric, and can easily be tricked with bad tests.  
+See it as simply one data point in our development process
+</aside>
+
+### Intellij Support for Test Results/Code Coverage
+
+* Can generate coverage reports in the IDE
+  * "Run Code With Coverage" 
+     * Covered methods are in green gutter, while not covered methods are in red. 
+* Can generate HTML/XML output to view test results/code coverage in web browser
+  - "Coverage" tab > "Generate Coverage Report"
+  - "Cover" tab > "Export Test Results..."
+
+### Maven Support for Code Coverage
+
+* Maven offers the same support agnostic of your IDE
