@@ -192,3 +192,33 @@ See it as simply one data point in our development process
 
 * Normal unit testing report in HTML → SureFire Report + Maven-Site
 * Code Coverage report in HTML → JaCoCo
+
+## Conditional Tests
+
+---
+
+### When Do We Want to Include Conditional Tests?
+
+* Method is **broken** & waiting on dev team to fix it
+* Method should be run at specific range of **Java version**: 13-18, 12+, <7…
+* Method should be run at specific **OS**: MS Windows, macOS, Linux, Solaris…
+* Method should be run only under specific **environment variables** or **system properties**
+    * For QA/UAT/Production/Dev... different environments
+
+<aside>
+❓
+
+### Why not just commenting out those conditional units (methods)?
+
+* To provide a more thorough reports
+* So that manager or QA teams are aware at the potential issues
+* Easy to forget broken methods
+* Manual toggling is clunky and is not automated
+</aside>
+
+## Annotations
+
+* `@Disabled` `@EnabledOnOs` on class/method level
+* `@EnabledOnJre` `@EnabledOnJreRange`
+* `@EnabledIfSystemProperty` `@EnabledIfEnvironmentVariable` → matches to plain text or regex
+    * System properties syntax: `-D<sysPropName>=<sysPropVal>`

@@ -34,7 +34,7 @@
                 <version>3.5.2</version>
                 <!-- If we only want to display failed tests... -->
                 <configuration>
-                    <showSuccess>false</showSuccess>
+<!--                    <showSuccess>false</showSuccess>-->
                 </configuration>
             </plugin>
         </plugins>
