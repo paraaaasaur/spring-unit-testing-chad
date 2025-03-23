@@ -23,10 +23,58 @@
     </dependencies>
 
 
-
     <!-- 2. Build Settings -->
-    <build/>
-    <reporting/>
+    <reporting>
+        <plugins>
+            <!-- This plugin should be downloaded correctly -->
+            <!-- Error message is due to IDE glitch so just ignore it (by Chád) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>3.5.2</version>
+                <!-- If we only want to display failed tests... -->
+                <configuration>
+                    <showSuccess>false</showSuccess>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+
+    <build>
+        <plugins>
+            <!-- Maven-site -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.21.0</version>
+            </plugin>
+            <!-- JaCoCo -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <!-- Customize functionality -->
+                <executions>
+                    <execution>
+                        <id>jacoco-prepare</id>
+<!--                        <phase>initialize</phase>-->
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 
     <!-- 3. More Project Information -->
     <name/>
@@ -37,6 +85,7 @@
     <organization/>
     <developers/>
     <contributors/>
+
 
     <!-- 4. Environment Settings -->
     <issueManagement/>

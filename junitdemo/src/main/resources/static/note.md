@@ -113,6 +113,82 @@ See it as simply one data point in our development process
   - "Coverage" tab > "Generate Coverage Report"
   - "Cover" tab > "Export Test Results..."
 
-### Maven Support for Code Coverage
+## Maven Support for Code Coverage
 
-* Maven offers the same support agnostic of your IDE
+* Maven offers the same support agnostic of the IDE of choice
+
+1. Install Maven (check with `mvn -version`)
+2. Run unit tests: `mvn clean test`
+3. Generate unit test reports
+   1. Include reporting plugin: SureFire-Report plugin
+      ```xml
+       <reporting>
+          <plugins>
+              <!-- This plugin should be downloaded correctly -->
+              <!-- Error msg is due to IDE glitch (by Chád) -->
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-surefire-report-plugin</artifactid>
+                  <version>3.5.2</version>
+                  <!-- If we only want to display failed tests... -->
+                  <configuration>
+                      <showSuccess>false</showSuccess>
+                  </configuration>
+              </plugin>
+          </plugins>
+       </reporting>
+      ```
+   2. Include Maven-site build plugin: HTML content support (css, images, etc)
+      ```xml
+      <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.21.0</version>
+            </plugin>
+        </plugins>
+      </build>
+      ```
+   3. Run `mvn site` to generate HTML content + unit test reports
+      * The report file is located at _target/site/surefire.html_
+   4. Include JaCoCo (Java Code Coverage) build plugin
+      * A free library used to generate code coverage report in HTML
+      * Provides a Maven build plugin
+      * We don't run default configuration; make sure to include  
+        the 2 <execution> items
+      * Now, running `mvn clean test` should generate code coverage  
+        report at _target/site/jacoco/index.html_
+       ```xml
+       <build>
+           <plugins>
+               <plugin>
+                   <groupId>org.jacoco</groupId>
+                   <artifactId>jacoco-maven-plugin</artifactId>
+                   <version>0.8.12</version>
+                   <!-- Customize functionality -->
+                   <executions>
+                       <execution>
+                           <id>jacoco-prepare</id>
+                           <!-- <phase>initialize</phase> -->    
+                           <goals>
+                               <goal>prepare-agent</goal>
+                           </goals>
+                       </execution>
+    
+                       <execution>
+                           <id>jacoco-report</id>
+                           <phase>test</phase>
+                           <goals>
+                               <goal>report</goal>
+                           </goals>
+                       </execution>
+                   </executions>
+               </plugin>
+           </plugins>
+       </build>
+       ```
+### Summary
+
+* Normal unit testing report in HTML → SureFire Report + Maven-Site
+* Code Coverage report in HTML → JaCoCo
