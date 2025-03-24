@@ -1,6 +1,8 @@
 package com.herbivore.tdd;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -51,5 +53,35 @@ class FizzBuzzTest {
 		String actual = FizzBuzz.compute(2);
 
 		assertEquals(expected, actual, "Should return 2");
+	}
+
+	@DisplayName("Testing with Small Data File")
+	@ParameterizedTest(name = "value={0}, expected={1}")
+	@CsvFileSource(resources = "/data/small-test-data.csv")
+	@Order(5)
+	void testForLoopOverArray(int value, String expected) {
+		assertEquals(expected, FizzBuzz.compute(value));
+	}
+
+	private class Archive {
+//		@DisplayName("Loop over Array")
+//		@Test
+//		@Order(5)
+		void testForLoopOverArray() {
+			Object[][] data = {
+					{1, "1"},
+					{2, "2"},
+					{3, "Fizz"},
+					{4, "4"},
+					{5, "Buzz"},
+					{6, "Fizz"},
+					{7, "7"},
+					{15, "FizzBuzz"}
+			};
+
+			for (Object[] row : data) {
+				assertEquals(row[1], FizzBuzz.compute((int)row[0]));
+			}
+		}
 	}
 }
