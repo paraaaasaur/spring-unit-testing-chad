@@ -1,4 +1,4 @@
-package com.herbivore;
+package com.herbivore.junitbasic;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.herbivore;
+package com.herbivore.junitbasic;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.Executable;
