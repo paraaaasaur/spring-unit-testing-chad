@@ -59,7 +59,23 @@ class FizzBuzzTest {
 	@ParameterizedTest(name = "value={0}, expected={1}")
 	@CsvFileSource(resources = "/data/small-test-data.csv")
 	@Order(5)
-	void testForLoopOverArray(int value, String expected) {
+	void testSmallTestData(int value, String expected) {
+		assertEquals(expected, FizzBuzz.compute(value));
+	}
+
+	@DisplayName("Testing with Small Data File")
+	@ParameterizedTest(name = "value={0}, expected={1}")
+	@CsvFileSource(resources = "/data/medium-test-data.csv")
+	@Order(6)
+	void testMediumTestData(int value, String expected) {
+		assertEquals(expected, FizzBuzz.compute(value));
+	}
+
+	@DisplayName("Testing with Small Data File")
+	@ParameterizedTest(name = "value={0}, expected={1}")
+	@CsvFileSource(resources = "/data/large-test-data.csv")
+	@Order(7)
+	void testLargeTestData(int value, String expected) {
 		assertEquals(expected, FizzBuzz.compute(value));
 	}
 
