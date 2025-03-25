@@ -35,3 +35,14 @@ Spring Boot provides rich testing support:
         <scope>test</scope>
     </dependency>
     ```
+  
+### Using ApplicationContext
+
+```java
+	@Autowired
+	private ApplicationContext context;
+
+    // ...
+
+    CollegeStudent studentTwo = context.getBean(CollegeStudent.class);
+```

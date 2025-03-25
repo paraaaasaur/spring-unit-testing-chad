@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -36,6 +37,10 @@ class ApplicationExampleTest {
 
 	@Autowired
 	private StudentGrades studentGrades;
+
+	// used to retrieve Spring bean
+	@Autowired
+	private ApplicationContext context;
 
 	@BeforeEach
 	void beforeEach() {
@@ -88,5 +93,29 @@ class ApplicationExampleTest {
 	void checkNullForStudentGrades() {
 		assertNotNull(studentGrades.checkNull(student.getStudentGrades().getMathGradeResults()),
 				"object should not be null");
+	}
+
+	@DisplayName("Create student without grade init")
+	@Test
+	void createStudentWithoutGradeInit() {
+		CollegeStudent studentTwo = context.getBean("collegeStudent", CollegeStudent.class);
+
+		studentTwo.setFirstname("Ryoma");
+		studentTwo.setLastname("Sakamoto");
+		studentTwo.setEmailAddress("skmt@gmail.com");
+
+		assertNotNull(studentTwo.getFirstname());
+		assertNotNull(studentTwo.getLastname());
+		assertNotNull(studentTwo.getEmailAddress());
+		assertNull(studentGrades.checkNull(studentTwo.getStudentGrades()));
+	}
+
+	@DisplayName("Verify student bean is prototype")
+	@Test
+	void verifyStudentBeanIsPrototype() {
+		CollegeStudent studentTwo = context.getBean("collegeStudent", CollegeStudent.class);
+
+		// Singleton: same object; prototype: new object
+		assertNotSame(student, studentTwo);
 	}
 }
