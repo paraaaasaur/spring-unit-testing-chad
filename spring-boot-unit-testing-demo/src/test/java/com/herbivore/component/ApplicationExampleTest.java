@@ -5,6 +5,7 @@ import com.herbivore.component.models.StudentGrades;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -117,5 +118,16 @@ class ApplicationExampleTest {
 
 		// Singleton: same object; prototype: new object
 		assertNotSame(student, studentTwo);
+	}
+
+	@DisplayName("Find grade points average")
+	@Test
+	void findGradePointsAverage() {
+		Executable exe1 = () -> assertEquals(321.2, studentGrades.addGradeResultsForSingleClass(
+				student.getStudentGrades().getMathGradeResults()));
+		Executable exe2 = () -> assertEquals(80.3, studentGrades.findGradePointAverage(
+				student.getStudentGrades().getMathGradeResults()));
+
+		assertAll(exe1, exe2);
 	}
 }
