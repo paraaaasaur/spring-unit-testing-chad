@@ -1,6 +1,8 @@
 package com.herbivore.component;
 
+import com.herbivore.component.dao.ApplicationDao;
 import com.herbivore.component.models.CollegeStudent;
+import com.herbivore.component.service.ApplicationService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +13,18 @@ public class MvcTestingExampleApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MvcTestingExampleApplication.class, args);
+	}
+
+	/* New for Section 2.2 */
+	@Bean(name = "applicationExample")
+	ApplicationService getApplicationService() {
+		return new ApplicationService();
+	}
+
+	/* New for Section 2.2 */
+	@Bean(name = "applicationDao")
+	ApplicationDao getApplicationDao() {
+		return new ApplicationDao();
 	}
 
 	@Bean(name = "collegeStudent")

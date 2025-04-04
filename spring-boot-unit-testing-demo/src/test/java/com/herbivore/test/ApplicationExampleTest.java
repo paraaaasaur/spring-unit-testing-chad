@@ -1,5 +1,6 @@
-package com.herbivore.component;
+package com.herbivore.test;
 
+import com.herbivore.component.MvcTestingExampleApplication;
 import com.herbivore.component.models.CollegeStudent;
 import com.herbivore.component.models.StudentGrades;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +17,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@SpringBootTest(classes = MvcTestingExampleApplication.class)
 class ApplicationExampleTest {
 
 	private static int count = 0;
