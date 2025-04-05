@@ -39,3 +39,12 @@
 
 * Replace `@Mock` + `@InjectMocks`   
   with `@MockitoBean` + `@Autowired`
+
+## Mockito on Throwing 
+
+* `doThrow(ex).when(mockObj).voidMethod();`
+* `when(mockObj.method()).thenThrow(ex)`
+
+## Multiple Stubbing
+
+* `when(mockObj).thenThrow(ex).thenReturn(stubVal).then...`

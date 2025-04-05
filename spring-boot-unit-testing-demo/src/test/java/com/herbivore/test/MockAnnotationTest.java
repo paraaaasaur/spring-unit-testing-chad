@@ -8,6 +8,7 @@ import com.herbivore.component.service.ApplicationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -93,5 +94,58 @@ class MockAnnotationTest {
 				service.checkNull(studentOne.getStudentGrades().getMathGradeResults()),
 				"Object should not be null"
 		);
+	}
+
+	@DisplayName("Multiple Stubbing")
+	@Test
+	void stubbingConsecutiveCalls() {
+		Executable daoExe = () -> dao.checkNull(dummyObj);
+		Executable serviceExe = () -> service.checkNull(dummyObj);
+		final String message = "No Exception thrown second time";
+
+
+		when(dao.checkNull(dummyObj))
+				.thenThrow(new RuntimeException("Aha!"))
+				.thenReturn(message);
+
+
+		assertThrows(Exception.class, serviceExe);
+		System.out.println("> 1");
+
+		assertThrows(Exception.class, serviceExe);
+//		assertEquals(message, service.checkNull(dummyObj));
+		System.out.println("> 2");
+
+		verify(dao, times(2)).checkNull(dummyObj);
+	}
+
+	@DisplayName("Throw Exceptions")
+	@Test
+	void throwRuntimeException() {
+		Executable daoExe = () -> dao.checkNull(dummyObj);
+		Executable serviceExe = () -> service.checkNull(dummyObj);
+
+
+		// # Make a method x throw exception y
+		// Method 1: General version - Not void-proof
+//		when(dao.checkNull(dummyObj))
+//				.thenThrow(new UnsupportedOperationException("Exception #1"))
+//				.thenThrow(new IllegalArgumentException("Exception #2"));
+
+		// Method 2: Void-proof version
+		doThrow(new UnsupportedOperationException("Exception #1"))
+				.doThrow(new IllegalArgumentException("Exception #2"))
+				.when(dao).checkNull(dummyObj);
+
+
+		assertThrows(UnsupportedOperationException.class, serviceExe);
+		System.out.println("> 1");
+
+		assertThrows(IllegalArgumentException.class, serviceExe);
+		System.out.println("> 2");
+
+		assertThrows(UnsupportedOperationException.class, serviceExe);
+//		assertThrows(IllegalArgumentException.class, serviceExe);
+		System.out.println("> 3");
 	}
 }
