@@ -8,16 +8,16 @@ import com.herbivore.component.service.ApplicationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 import java.util.function.Supplier;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.herbivore.test.Dummies.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -33,10 +33,12 @@ class MockAnnotationTest {
 	@Autowired
 	StudentGrades grades;
 
-	@Mock
+//	@Mock
+	@MockitoBean
 	private ApplicationDao dao;
 
-	@InjectMocks
+//	@InjectMocks
+	@Autowired
 	private ApplicationService service;
 
 	@BeforeEach
@@ -66,5 +68,30 @@ class MockAnnotationTest {
 //		verify(dao, times(0))
 		verify(dao, times(1))
 				.addGradeResultsForSingleClass(supplier.get());
+	}
+
+	@DisplayName("Find Gpa")
+	@Test
+	void assertEqualsTestFindGpa() {
+		when(dao.findGradePointAverage(dummyDoubleList))
+				.thenReturn(88.31);
+
+		assertEquals(88.31, service.findGradePointAverage(dummyDoubleList));
+
+		verify(dao, times(1))
+//				.findGradePointAverage(List.of());
+				.findGradePointAverage(dummyDoubleList);
+	}
+
+	@DisplayName("Not Null")
+	@Test
+	void testAssertNotNull() {
+		when(dao.checkNull(grades.getMathGradeResults()))
+				.thenReturn(dummyObj);
+
+		assertNotNull(
+				service.checkNull(studentOne.getStudentGrades().getMathGradeResults()),
+				"Object should not be null"
+		);
 	}
 }

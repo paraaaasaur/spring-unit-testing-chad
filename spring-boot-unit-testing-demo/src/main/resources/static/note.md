@@ -32,3 +32,10 @@
 * `when(method x).thenReturn(y);`
   - When method x (from a `@Mock` object!) is called, its output is set to y.
 * Params for DOCs & SUTs have to match, even if they are just dummy values.
+* `verify(mockDOC, times(2)).targetMethod(sameParam)`: 
+  - Checks method being run exactly 2 times
+
+## Mockito for Spring Boot
+
+* Replace `@Mock` + `@InjectMocks`   
+  with `@MockitoBean` + `@Autowired`
