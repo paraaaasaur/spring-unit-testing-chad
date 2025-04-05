@@ -5,6 +5,7 @@ import lombok.Setter;
 
 @Setter @Getter
 public class CollegeStudent implements Student {
+    private int id;
     private String firstname;
     private String lastname;
     private String emailAddress;
@@ -36,5 +37,9 @@ public class CollegeStudent implements Student {
     @Override
     public String getFullName() {
         return getFirstname() + " " + getLastname();
+    }
+
+    private String getFirstNameAndId() {
+        return getFirstname() + " " + getId();
     }
 }
