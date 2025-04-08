@@ -72,4 +72,11 @@ class StudentAndGradeServiceTest {
 
 		assertFalse(studentService.isStudentFound(0));
 	}
+
+	@Test
+	void testQueryAnnotation() {
+		var students = studentDao.findByEmailAddressLike("%gmail%");
+		System.out.println(students.getClass());
+		students.forEach(System.out::println);
+	}
 }
