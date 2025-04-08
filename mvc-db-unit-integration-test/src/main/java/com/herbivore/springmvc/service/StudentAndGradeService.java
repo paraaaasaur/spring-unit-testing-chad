@@ -5,6 +5,8 @@ import com.herbivore.springmvc.repository.StudentDao;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 public class StudentAndGradeService {
@@ -20,5 +22,9 @@ public class StudentAndGradeService {
 		CollegeStudent student = new CollegeStudent(firstname, lastname, emailAddress);
 		student.setId(0);
 		studentDao.save(student);
+	}
+
+	public boolean isStudentFound(int id) {
+		return studentDao.findById(id).isPresent();
 	}
 }
