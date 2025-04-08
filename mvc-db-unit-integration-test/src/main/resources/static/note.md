@@ -13,3 +13,8 @@
 * Where? → `@beforeEach` and `@afterEach` methods
 * How? → **`jdbcTemplate.execute()`** + SQL statements
   - A helper class in Spring framework, to provide handy JDBC-level operations
+
+
+## You know...
+
+* `@Query("sql-like statement")` can be used on `CrudRepository` for custom queries 
