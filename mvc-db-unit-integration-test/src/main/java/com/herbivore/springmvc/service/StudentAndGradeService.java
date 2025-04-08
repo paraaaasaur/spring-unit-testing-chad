@@ -27,4 +27,9 @@ public class StudentAndGradeService {
 	public boolean isStudentFound(int id) {
 		return studentDao.findById(id).isPresent();
 	}
+
+	public void deleteStudent(int id) {
+		if (isStudentFound(id))
+			studentDao.deleteById(id);
+	}
 }

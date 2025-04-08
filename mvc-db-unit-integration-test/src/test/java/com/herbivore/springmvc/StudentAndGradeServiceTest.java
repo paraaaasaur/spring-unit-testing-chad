@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 // rn just use the regular one
@@ -78,5 +80,19 @@ class StudentAndGradeServiceTest {
 		var students = studentDao.findByEmailAddressLike("%gmail%");
 		System.out.println(students.getClass());
 		students.forEach(System.out::println);
+	}
+
+	@DisplayName("TTD for Service#Delete-Student")
+	@Test
+	void deleteStudentService() {
+		Optional<CollegeStudent> studentOp = studentDao.findById(1);
+
+		assertTrue(studentOp.isPresent(), "Student#1 should exist");
+
+		studentService.deleteStudent(1);
+
+		studentOp = studentDao.findById(1);
+
+		assertFalse(studentOp.isPresent(), "Student#1 should've been deleted");
 	}
 }
