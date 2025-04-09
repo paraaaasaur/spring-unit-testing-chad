@@ -32,4 +32,8 @@ public class StudentAndGradeService {
 		if (isStudentFound(id))
 			studentDao.deleteById(id);
 	}
+
+	public Iterable<CollegeStudent> getGradebook() {
+		return studentDao.findAll();
+	}
 }
