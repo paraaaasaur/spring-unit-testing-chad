@@ -28,6 +28,11 @@ spring.jpa.hibernate.ddl-auto=create-drop
 spring.jpa.show-sql=true
 ```
 
+### Using Separate SQL Files
+
+1. make a .sql script under test resources
+2. `@Sql("/insert-data.sql")` on the test method
+
 ## You know...
 
 * `@Query("sql-like statement")` can be used on `CrudRepository` for custom queries 
