@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,6 +99,7 @@ class StudentAndGradeServiceTest {
 		assertFalse(studentOp.isPresent(), "Student#1 should've been deleted");
 	}
 
+	@Sql("/insert-data.sql")
 	@DisplayName("TTD for Service#Get-GradeBook")
 	@Test
 	void getGradeBookService() {
@@ -108,7 +110,7 @@ class StudentAndGradeServiceTest {
 		for (var cs : iterableCollegeStudents) {
 			collegeStudents.add(cs);
 		}
-		
-		assertEquals(1, collegeStudents.size());
+
+		assertEquals(5, collegeStudents.size());
 	}
 }
