@@ -1,38 +1,47 @@
-# MVC+DB Web App & Unit/Integration Test
+# Controller Testing
 
-## H2 Database
+# Development Process
 
-* Embedded, in-memory db (like H2) is good to go by just adding to dependency.
-  - No need for manual connection setup 
-  - Further customization is feasible as well
+---
 
-### Sample Data
+1. Add annotation `@AutoConfigureMockMvc`
+2. Inject `MockMvc`
+3. Perform web requests
+4. Define expectations
+5. Assert results
 
-#### Set up & clean up
+## Boilerplate Setup for MVC Testing
 
-* Where? → `@beforeEach` and `@afterEach` methods
-* How? → **`jdbcTemplate.execute()`** + SQL statements
-  - A helper class in Spring framework, to provide handy JDBC-level operations
+- `MockMvc`: Main entry point for server-side Spring MVC test support
+- `@AutoConfigureMockMvc`: In pair with ↑ for necessary configuration
 
-### H2 Properties
+```java
+@TestPropertySource("/application.properties")
+@AutoConfigureMockMvc
+@SpringBootTest(classes = GradebookController.class)
+public class GradebookControllerTest {
+	private final JdbcTemplate jdbcTemplate;
+	private final MockMvc mockMvc;
+	@Mock
+	private StudentAndGradeService studentAndGradeService;
 
-```properties
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=password
-spring.datasource.initialization-mode=always
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.h2.console.enabled=true
-spring.jpa.hibernate.ddl-auto=create-drop
-spring.jpa.show-sql=true
+	public GradebookControllerTest(JdbcTemplate jdbcTemplate, MockMvc mockMvc) {
+		this.jdbcTemplate = jdbcTemplate;
+		this.mockMvc = mockMvc;
+	}
+
+	@BeforeEach
+	void setup() {
+		// ...
+	}
+
+	@AfterEach
+	void cleanUpAfterTransaction() {
+		// ...
+	}
+	
+	// test methods from here
+}
 ```
 
-### Using Separate SQL Files
-
-1. make a .sql script under test resources
-2. `@Sql("/insert-data.sql")` on the test method
-
-## You know...
-
-* `@Query("sql-like statement")` can be used on `CrudRepository` for custom queries 
+---
