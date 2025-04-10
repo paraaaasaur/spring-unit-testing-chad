@@ -44,4 +44,22 @@ public class GradebookControllerTest {
 }
 ```
 
+
+## `MockMvc` Workflow Scenarios
+---
+(Too many trivial helper classes here... use `import static`)
+1. GET request + status code 200(isOk()) ⇒ return to view index.html
+    ```java
+    @Test
+    public void getStudentsHttpRequest () throws Exception {
+        // 1. GET request | expects HTTP 200 OK
+        MvcResult mvcResult = mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andReturn();
+    
+        // 2. View resolution | verifies: the view returned == "index.html"
+        ModelAndView mav = mvcResult.getModelAndView();
+        ModelAndViewAssert.assertViewName(mav, "index");
+    }
+    ```
 ---
