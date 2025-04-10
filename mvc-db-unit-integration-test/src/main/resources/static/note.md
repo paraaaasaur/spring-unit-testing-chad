@@ -63,4 +63,45 @@ public class GradebookControllerTest {
     }
     ```
 2. POST(create student): Application/JSON(content-type) + model ⇒ return to view index.html
+   - Test
+       ```java
+       @DisplayName("TDD for POST-Create Student Endpoint")
+       @Test
+       void createStudentHttpRequest() throws Exception {
+           // 1. Pathway check: from entry(request) to exit("index.html")
+           MvcResult mvcResult = mockMvc.perform(post("/")
+                           .contentType(MediaType.APPLICATION_JSON)
+                           .param("firstname", "John")
+                           .param("lastname", "Doe")
+                           .param("emailAddress", "jd@gmail.com"))
+                   .andExpect(status().isOk())
+                   .andReturn();
+    
+           ModelAndView mav = mvcResult.getModelAndView();
+           ModelAndViewAssert.assertViewName(mav, "index");
+    
+           // 2. Functionality check: create student
+           CollegeStudent dbStudent = studentDao
+                   .findByEmailAddress(requestMock.getParameter("emailAddress"));
+           assertNotNull(dbStudent, "Student should've been created");
+       }
+       ```
+   - Tested controller method
+       ```java
+       @PostMapping("/") // comment to break assertViewName
+       public String createStudent(
+               @ModelAttribute("whatever-when-receive-only") CollegeStudent student,
+       //			@ModelAttribute("student") CollegeStudent student,
+               Model model
+       ) {
+           // comment to break assertNotNull
+           studentAndGradeService.createStudent(
+                   student.getFirstname(),
+                   student.getLastname(),
+                   student.getEmailAddress()
+           );
+    
+           return "index";
+       }
+       ```
 ---
