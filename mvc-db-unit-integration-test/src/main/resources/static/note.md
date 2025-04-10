@@ -62,4 +62,5 @@ public class GradebookControllerTest {
         ModelAndViewAssert.assertViewName(mav, "index");
     }
     ```
+2. POST(create student): Application/JSON(content-type) + model ⇒ return to view index.html
 ---

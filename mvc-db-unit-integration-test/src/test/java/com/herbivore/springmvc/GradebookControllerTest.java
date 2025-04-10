@@ -2,15 +2,16 @@ package com.herbivore.springmvc;
 
 import com.herbivore.springmvc.model.CollegeStudent;
 import com.herbivore.springmvc.model.GradebookCollegeStudent;
+import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.ModelAndViewAssert;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,8 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @TestPropertySource("/application.properties")
@@ -34,13 +37,29 @@ public class GradebookControllerTest {
 	private final MockMvc mockMvc;
 	@Mock
 	private StudentAndGradeService studentAndGradeServiceMock;
+	private static MockHttpServletRequest requestMock;
+	private final StudentDao studentDao;
+
 
 	@Autowired
-	public GradebookControllerTest(JdbcTemplate jdbcTemplate, MockMvc mockMvc) {
+	public GradebookControllerTest(JdbcTemplate jdbcTemplate, MockMvc mockMvc, StudentDao studentDao) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.mockMvc = mockMvc;
+		this.studentDao = studentDao;
 	}
 
+	// reminder: @BeforeAll methods are always public static void
+	@BeforeAll
+	public static void beforeAll() {
+		// may use static block alternatively, because
+		// JUnit lifecycle isn't relevant for this case
+		{
+			requestMock = new MockHttpServletRequest();
+			requestMock.setParameter("firstname", "John");
+			requestMock.setParameter("lastname", "Doe");
+			requestMock.setParameter("emailAddress", "jd@gmail.com");
+		}
+	}
 
 	@BeforeEach
 	void setup() {
@@ -77,6 +96,33 @@ public class GradebookControllerTest {
 		// 2. View resolution | verifies: the view returned == "index.html"
 		ModelAndView mav = mvcResult.getModelAndView();
 		ModelAndViewAssert.assertViewName(mav, "index");
+	}
+
+	/**
+	 * <h3>MockMvc Workflow Scenario: POST-create student</h3>
+	 * 1. POST: Application/JSON(content-type) + params<br>
+	 * 2. View resolution | verifies: the view returned == "index.html"<br>
+	 **/
+	@DisplayName("TDD for POST-Create Student Endpoint")
+	@Test
+	void createStudentHttpRequest() throws Exception {
+		// 1. Pathway check: from entry(request) to exit("index.html")
+		MvcResult mvcResult = mockMvc.perform(post("/")
+						.contentType(MediaType.APPLICATION_JSON)
+						.param("firstname", "John")
+						.param("lastname", "Doe")
+						.param("emailAddress", "jd@gmail.com"))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		ModelAndView mav = mvcResult.getModelAndView();
+		ModelAndViewAssert.assertViewName(mav, "index");
+
+
+		// 2. Functionality check: create student
+		CollegeStudent dbStudent = studentDao
+				.findByEmailAddress(requestMock.getParameter("emailAddress"));
+		assertNotNull(dbStudent, "Student should've been created");
 	}
 
 	private class Archived {
