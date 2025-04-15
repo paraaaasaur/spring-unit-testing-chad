@@ -105,3 +105,11 @@ public class GradebookControllerTest {
        }
        ```
 ---
+
+## Update the UI
+
+* Data binding:
+  - Request/x-www-form-urlencoded: name-value pairs  
+  - To-Controller: DTO parameter
+    - Doesn't even require annotations like `@ModelAttribute`, `@RequestBody`
+    - Doesn't require explicitly adding or accessing a `Model`

@@ -27,9 +27,9 @@ public class GradebookController {
 		return "index";
 	}
 
-	@PostMapping("/") // comment to break assertViewName
+	@PostMapping(name = "/") // comment to break assertViewName
 	public String createStudent(
-			@ModelAttribute("whatever") CollegeStudent student,
+			CollegeStudent student,
 			Model model
 	) {
 		// comment to break assertNotNull
@@ -38,8 +38,9 @@ public class GradebookController {
 				student.getLastname(),
 				student.getEmailAddress()
 		);
+		System.out.println(model);
 
-		return "index";
+		return "redirect:/";
 	}
 
 	@GetMapping("/studentInformation/{id}")
