@@ -22,8 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -123,6 +122,33 @@ public class GradebookControllerTest {
 		CollegeStudent dbStudent = studentDao
 				.findByEmailAddress(requestMock.getParameter("emailAddress"));
 		assertNotNull(dbStudent, "Student should've been created");
+	}
+
+	/**
+	 * <h3>MockMvc Workflow Scenario: POST-delete student</h3>
+	 * 1. POST: PathVariable<br>
+	 * 2. View resolution | verifies: the view returned == "index.html"<br>
+	 **/
+	@DisplayName("TDD for POST-Delete Student Endpoint")
+	@Test
+	void deleteStudentHttpRequest() throws Exception {
+		// 0. Sanity check: "We do have test data#1 from @BeforeEach, right...?"
+		assertTrue(studentDao.findById(1).isPresent());
+
+
+		// 1. Pathway check
+		final String endpoint = "/delete/student/{id}";
+		MvcResult mvcResult = mockMvc.perform(post(endpoint, 1))
+				.andExpect(status().is3xxRedirection())
+				.andReturn();
+
+		ModelAndView mav = mvcResult.getModelAndView();
+		ModelAndViewAssert.assertViewName(mav, "redirect:/");
+
+
+		// 2. Functionality check
+		boolean condition = studentDao.findById(1).isPresent();
+		assertFalse(condition, "Student should've been deleted");
 	}
 
 	private class Archived {
