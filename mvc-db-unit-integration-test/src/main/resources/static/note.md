@@ -104,6 +104,33 @@ public class GradebookControllerTest {
            return "index";
        }
        ```
+
+3. POST(delete-student): PathVariable/1 ⇒ return to view index.html
+   - Test
+       ```java
+          @DisplayName("TDD for POST-Delete Student Endpoint")
+          @Test
+          void deleteStudentHttpRequest() throws Exception {
+              // 0. Sanity check: "We do have test data#1 from @BeforeEach, right...?"
+              assertTrue(studentDao.findById(1).isPresent());
+    
+    
+               // 1. Pathway check
+               final String endpoint = "/delete/student/{id}";
+               MvcResult mvcResult = mockMvc.perform(post(endpoint, 1))
+                       .andExpect(status().is3xxRedirection())
+                       .andReturn();
+    
+               ModelAndView mav = mvcResult.getModelAndView();
+               ModelAndViewAssert.assertViewName(mav, "redirect:/");
+    
+    
+               // 2. Functionality check
+               boolean condition = studentDao.findById(1).isPresent();
+			   assertFalse(condition, "Student should've been deleted");
+           }
+       ```
+
 ---
 
 ## Update the UI
