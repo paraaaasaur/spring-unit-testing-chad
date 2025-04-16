@@ -130,7 +130,14 @@ public class GradebookControllerTest {
 			   assertFalse(condition, "Student should've been deleted");
            }
        ```
-
+   - Test controller method
+       ```java
+         	@PostMapping("/delete/student/{id}")
+            public String deleteStudent(@PathVariable int id) {
+                studentAndGradeService.deleteStudent(id);
+                return "redirect:/";
+            }
+       ```
 ---
 
 ## Update the UI
