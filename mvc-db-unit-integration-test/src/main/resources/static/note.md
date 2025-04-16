@@ -16,6 +16,7 @@
 - `@AutoConfigureMockMvc`: In pair with ↑ for necessary configuration
 
 ```java
+
 @TestPropertySource("/application.properties")
 @AutoConfigureMockMvc
 @SpringBootTest(classes = GradebookController.class)
@@ -39,15 +40,15 @@ public class GradebookControllerTest {
 	void cleanUpAfterTransaction() {
 		// ...
 	}
-	
+
 	// test methods from here
 }
 ```
 
-
 ## `MockMvc` Workflow Scenarios
 ---
 (Too many trivial helper classes here... use `import static`)
+
 1. GET request + status code 200(isOk()) ⇒ return to view index.html
     ```java
     @Test
@@ -63,87 +64,115 @@ public class GradebookControllerTest {
     }
     ```
 2. POST(create student): Application/JSON(content-type) + model ⇒ return to view index.html
-   - Test
-       ```java
-       @DisplayName("TDD for POST-Create Student Endpoint")
-       @Test
-       void createStudentHttpRequest() throws Exception {
-           // 1. Pathway check: from entry(request) to exit("index.html")
-           MvcResult mvcResult = mockMvc.perform(post("/")
-                           .contentType(MediaType.APPLICATION_JSON)
-                           .param("firstname", "John")
-                           .param("lastname", "Doe")
-                           .param("emailAddress", "jd@gmail.com"))
-                   .andExpect(status().isOk())
-                   .andReturn();
-    
-           ModelAndView mav = mvcResult.getModelAndView();
-           ModelAndViewAssert.assertViewName(mav, "index");
-    
-           // 2. Functionality check: create student
-           CollegeStudent dbStudent = studentDao
-                   .findByEmailAddress(requestMock.getParameter("emailAddress"));
-           assertNotNull(dbStudent, "Student should've been created");
-       }
-       ```
-   - Tested controller method
-       ```java
-       @PostMapping("/") // comment to break assertViewName
-       public String createStudent(
-               @ModelAttribute("whatever-when-receive-only") CollegeStudent student,
-       //			@ModelAttribute("student") CollegeStudent student,
-               Model model
-       ) {
-           // comment to break assertNotNull
-           studentAndGradeService.createStudent(
-                   student.getFirstname(),
-                   student.getLastname(),
-                   student.getEmailAddress()
-           );
-    
-           return "index";
-       }
-       ```
+    - Test
+        ```java
+        @DisplayName("TDD for POST-Create Student Endpoint")
+        @Test
+        void createStudentHttpRequest() throws Exception {
+            // 1. Pathway check: from entry(request) to exit("index.html")
+            MvcResult mvcResult = mockMvc.perform(post("/")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("firstname", "John")
+                            .param("lastname", "Doe")
+                            .param("emailAddress", "jd@gmail.com"))
+                    .andExpect(status().isOk())
+                    .andReturn();
+     
+            ModelAndView mav = mvcResult.getModelAndView();
+            ModelAndViewAssert.assertViewName(mav, "index");
+     
+            // 2. Functionality check: create student
+            CollegeStudent dbStudent = studentDao
+                    .findByEmailAddress(requestMock.getParameter("emailAddress"));
+            assertNotNull(dbStudent, "Student should've been created");
+        }
+        ```
+    - Tested controller method
+        ```java
+        @PostMapping("/") // comment to break assertViewName
+        public String createStudent(
+                @ModelAttribute("whatever-when-receive-only") CollegeStudent student,
+        //			@ModelAttribute("student") CollegeStudent student,
+                Model model
+        ) {
+            // comment to break assertNotNull
+            studentAndGradeService.createStudent(
+                    student.getFirstname(),
+                    student.getLastname(),
+                    student.getEmailAddress()
+            );
+     
+            return "index";
+        }
+        ```
 
 3. POST(delete-student): PathVariable/1 ⇒ return to view index.html
-   - Test
-       ```java
-          @DisplayName("TDD for POST-Delete Student Endpoint")
-          @Test
-          void deleteStudentHttpRequest() throws Exception {
-              // 0. Sanity check: "We do have test data#1 from @BeforeEach, right...?"
-              assertTrue(studentDao.findById(1).isPresent());
-    
-    
-               // 1. Pathway check
-               final String endpoint = "/delete/student/{id}";
-               MvcResult mvcResult = mockMvc.perform(post(endpoint, 1))
-                       .andExpect(status().is3xxRedirection())
-                       .andReturn();
-    
-               ModelAndView mav = mvcResult.getModelAndView();
-               ModelAndViewAssert.assertViewName(mav, "redirect:/");
-    
-    
-               // 2. Functionality check
-               boolean condition = studentDao.findById(1).isPresent();
-			   assertFalse(condition, "Student should've been deleted");
-           }
-       ```
-   - Test controller method
-       ```java
-         	@PostMapping("/delete/student/{id}")
+    - Test
+        ```java
+           @DisplayName("TDD for POST-Delete Student Endpoint")
+           @Test
+           void deleteStudentHttpRequest() throws Exception {
+               // 0. Sanity check: "We do have test data#1 from @BeforeEach, right...?"
+               assertTrue(studentDao.findById(1).isPresent());
+     
+     
+                // 1. Pathway check
+                final String endpoint = "/delete/student/{id}";
+                MvcResult mvcResult = mockMvc.perform(post(endpoint, 1))
+                        .andExpect(status().is3xxRedirection())
+                        .andReturn();
+     
+                ModelAndView mav = mvcResult.getModelAndView();
+                ModelAndViewAssert.assertViewName(mav, "redirect:/");
+     
+     
+                // 2. Functionality check
+                boolean condition = studentDao.findById(1).isPresent();
+                assertFalse(condition, "Student should've been deleted");
+            }
+        ```
+    - Test controller method
+        ```java
+              @PostMapping("/delete/student/{id}")
+             public String deleteStudent(@PathVariable int id) {
+                 studentAndGradeService.deleteStudent(id);
+                 return "redirect:/";
+             }
+        ```
+4. Manual handling towards error page when deleted student ID doesn’t exist
+    - Test
+        ```java
+            @DisplayName("TDD for Error Page Route If deleted Student Doesn't Exist")
+            @Test
+            void deleteStudentHttpRequestErrorPage() throws Exception {
+                final String endpoint = "/delete/student/{id}";
+                MvcResult mvcResult = mockMvc.perform(post(endpoint, 0))
+                        .andExpect(status().isOk())
+                        .andReturn();
+     
+                ModelAndView mav = mvcResult.getModelAndView();
+                ModelAndViewAssert.assertViewName(mav, "error");
+            }
+        ```
+    - Test controller method
+        ```java
+            @PostMapping("/delete/student/{id}")
             public String deleteStudent(@PathVariable int id) {
+                if (!studentAndGradeService.checkIfStudentIsNull(id)) {
+                    return "error";
+                }
+     
                 studentAndGradeService.deleteStudent(id);
                 return "redirect:/";
             }
-       ```
+        ```
+
 ---
 
 ## Update the UI
 
 * Data binding:
-  - Request/x-www-form-urlencoded: name-value pairs  
-  - To-Controller: DTO parameter
-    - Doesn't even require annotations like `@ModelAttribute`, `@RequestBody`
-    - Doesn't require explicitly adding or accessing a `Model`
+    - Request/x-www-form-urlencoded: name-value pairs
+    - To-Controller: DTO parameter
+        - Doesn't even require annotations like `@ModelAttribute`, `@RequestBody`
+        - Doesn't require explicitly adding or accessing a `Model`

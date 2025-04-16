@@ -150,6 +150,18 @@ public class GradebookControllerTest {
 		assertFalse(condition, "Student should've been deleted");
 	}
 
+	@DisplayName("TDD for Error Page Route If deleted Student Doesn't Exist")
+	@Test
+	void deleteStudentHttpRequestErrorPage() throws Exception {
+		final String endpoint = "/delete/student/{id}";
+		MvcResult mvcResult = mockMvc.perform(post(endpoint, 0))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		ModelAndView mav = mvcResult.getModelAndView();
+		ModelAndViewAssert.assertViewName(mav, "error");
+	}
+
 	private class Archived {
 		//		@DisplayName("Test Service Mock")
 //		@Test
