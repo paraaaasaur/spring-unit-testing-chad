@@ -138,6 +138,33 @@ public class GradebookControllerTest {
                 return "redirect:/";
             }
        ```
+4. Manual handling towards error page when deleted student ID doesn’t exist
+   - Test
+       ```java
+           @DisplayName("TDD for Error Page Route If deleted Student Doesn't Exist")
+           @Test
+           void deleteStudentHttpRequestErrorPage() throws Exception {
+               final String endpoint = "/delete/student/{id}";
+               MvcResult mvcResult = mockMvc.perform(post(endpoint, 0))
+                       .andExpect(status().isOk())
+                       .andReturn();
+    
+               ModelAndView mav = mvcResult.getModelAndView();
+               ModelAndViewAssert.assertViewName(mav, "error");
+           }
+       ```
+   - Test controller method
+       ```java
+           @PostMapping("/delete/student/{id}")
+           public String deleteStudent(@PathVariable int id) {
+               if (!studentAndGradeService.checkIfStudentIsNull(id)) {
+                   return "error";
+               }
+    
+               studentAndGradeService.deleteStudent(id);
+               return "redirect:/";
+           }
+       ```
 ---
 
 ## Update the UI

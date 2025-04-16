@@ -45,6 +45,10 @@ public class GradebookController {
 
 	@PostMapping("/delete/student/{id}")
 	public String deleteStudent(@PathVariable int id) {
+		if (!studentAndGradeService.checkIfStudentIsNull(id)) {
+			return "error";
+		}
+
 		studentAndGradeService.deleteStudent(id);
 		return "redirect:/";
 	}
