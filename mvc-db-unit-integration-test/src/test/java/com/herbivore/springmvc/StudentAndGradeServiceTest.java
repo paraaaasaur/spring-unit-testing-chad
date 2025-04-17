@@ -1,12 +1,10 @@
 package com.herbivore.springmvc;
 
 import com.herbivore.springmvc.model.CollegeStudent;
+import com.herbivore.springmvc.model.MathGrade;
 import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -112,5 +110,21 @@ class StudentAndGradeServiceTest {
 		}
 
 		assertEquals(5, collegeStudents.size());
+	}
+
+	// CH9: Create grade service
+
+	@DisplayName("TTD for Grade Functionality")
+	@Test
+	void createGradeService() {
+
+		// Create the grade
+		assertTrue(studentService.createGrade(80.50, 1, "math"));
+
+		// Get all grades with studentId
+		Iterable<MathGrade> mathGrades = mathGradeDao.findGradeByStudentId(1);
+
+		// Verify there are grades
+		assertTrue(mathGrades.iterator().hasNext(), "Student#1 has math grade");
 	}
 }
