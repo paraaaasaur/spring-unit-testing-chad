@@ -1,8 +1,12 @@
 package com.herbivore.springmvc;
 
 import com.herbivore.springmvc.model.CollegeStudent;
+import com.herbivore.springmvc.model.HistoryGrade;
 import com.herbivore.springmvc.model.MathGrade;
+import com.herbivore.springmvc.model.ScienceGrade;
+import com.herbivore.springmvc.repository.HistoryGradeDao;
 import com.herbivore.springmvc.repository.MathGradeDao;
+import com.herbivore.springmvc.repository.ScienceGradeDao;
 import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
 import org.junit.jupiter.api.AfterEach;
@@ -30,14 +34,18 @@ class StudentAndGradeServiceTest {
 	private final StudentDao studentDao;
 	private final JdbcTemplate jdbcTemplate;
 	private final MathGradeDao mathGradeDao;
+	private final ScienceGradeDao scienceGradeDao;
+	private final HistoryGradeDao historyGradeDao;
 
 
 	@Autowired
-	protected StudentAndGradeServiceTest(StudentAndGradeService studentService, StudentDao studentDao, JdbcTemplate jdbcTemplate, MathGradeDao mathGradeDao) {
+	protected StudentAndGradeServiceTest(StudentAndGradeService studentService, StudentDao studentDao, JdbcTemplate jdbcTemplate, MathGradeDao mathGradeDao, ScienceGradeDao scienceGradeDao, HistoryGradeDao historyGradeDao) {
 		this.studentService = studentService;
 		this.studentDao = studentDao;
 		this.jdbcTemplate = jdbcTemplate;
 		this.mathGradeDao = mathGradeDao;
+		this.scienceGradeDao = scienceGradeDao;
+		this.historyGradeDao = historyGradeDao;
 	}
 
 
@@ -126,12 +134,17 @@ class StudentAndGradeServiceTest {
 
 		// Create the grade
 		assertTrue(studentService.createGrade(80.50, 1, "math"));
+		assertTrue(studentService.createGrade(80.50, 1, "science"));
+		assertTrue(studentService.createGrade(80.50, 1, "history"));
 
 		// Get all grades with studentId
 		Iterable<MathGrade> mathGrades = mathGradeDao.findGradeByStudentId(1);
+		Iterable<ScienceGrade> scienceGrades = scienceGradeDao.findGradeByStudentId(1);
+		Iterable<HistoryGrade> historyGrades = historyGradeDao.findGradeByStudentId(1);
 
 		// Verify there are grades
-		System.out.println(mathGrades);
 		assertTrue(mathGrades.iterator().hasNext(), "Student#1 has math grade");
+		assertTrue(scienceGrades.iterator().hasNext(), "Student#1 has science grade");
+		assertTrue(historyGrades.iterator().hasNext(), "Student#1 has history grade");
 	}
 }
