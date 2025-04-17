@@ -9,10 +9,7 @@ import com.herbivore.springmvc.repository.MathGradeDao;
 import com.herbivore.springmvc.repository.ScienceGradeDao;
 import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -186,7 +183,13 @@ class StudentAndGradeServiceTest {
 	@Test
 	void deleteGradeService() {
 		// Return student id after deletion
-		int studentId = studentService.deleteGrade(1, MATH);
-		assertEquals(1, studentId);
+		int studentIdFromMath = studentService.deleteGrade(1, MATH);
+		assertEquals(1, studentIdFromMath);
+
+		int studentIdFromScience = studentService.deleteGrade(1, SCIENCE);
+		assertEquals(1, studentIdFromScience);
+
+		int studentIdFromHistory = studentService.deleteGrade(1, HISTORY);
+		assertEquals(1, studentIdFromHistory);
 	}
 }

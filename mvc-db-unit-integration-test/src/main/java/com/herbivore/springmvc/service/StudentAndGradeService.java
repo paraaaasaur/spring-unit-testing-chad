@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static com.herbivore.springmvc.model.Grade.Type.*;
+
 @Service
 @Transactional
 public class StudentAndGradeService {
@@ -81,5 +83,35 @@ public class StudentAndGradeService {
 
 
 		return true;
+	}
+
+	public int deleteGrade(int gradeId, Grade.Type gradeType) {
+		int studentId = 0;
+
+		if (gradeType == MATH) {
+			Optional<MathGrade> mathGrade = mathGradeDao.findById(gradeId);
+			if (mathGrade.isPresent()) {
+				studentId = mathGrade.get().getStudentId();
+				mathGradeDao.delete(mathGrade.get());
+			}
+		}
+
+		if (gradeType == SCIENCE) {
+			Optional<ScienceGrade> scienceGrade = scienceGradeDao.findById(gradeId);
+			if (scienceGrade.isPresent()) {
+				studentId = scienceGrade.get().getStudentId();
+				scienceGradeDao.delete(scienceGrade.get());
+			}
+		}
+
+		if (gradeType == HISTORY) {
+			Optional<HistoryGrade> historyGrade = historyGradeDao.findById(gradeId);
+			if (historyGrade.isPresent()) {
+				studentId = historyGrade.get().getStudentId();
+				historyGradeDao.delete(historyGrade.get());
+			}
+		}
+
+		return studentId;
 	}
 }
