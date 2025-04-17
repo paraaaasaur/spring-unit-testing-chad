@@ -131,6 +131,7 @@ class StudentAndGradeServiceTest {
 		Iterable<MathGrade> mathGrades = mathGradeDao.findGradeByStudentId(1);
 
 		// Verify there are grades
+		System.out.println(mathGrades);
 		assertTrue(mathGrades.iterator().hasNext(), "Student#1 has math grade");
 	}
 }

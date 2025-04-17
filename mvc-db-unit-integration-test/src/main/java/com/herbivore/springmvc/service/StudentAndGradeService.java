@@ -1,6 +1,8 @@
 package com.herbivore.springmvc.service;
 
 import com.herbivore.springmvc.model.CollegeStudent;
+import com.herbivore.springmvc.model.MathGrade;
+import com.herbivore.springmvc.repository.MathGradeDao;
 import com.herbivore.springmvc.repository.StudentDao;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,10 +13,14 @@ import java.util.Optional;
 @Transactional
 public class StudentAndGradeService {
 	private final StudentDao studentDao;
+	private final MathGrade mathGrade;
+	private final MathGradeDao mathGradeDao;
 
 
-	public StudentAndGradeService(StudentDao studentDao) {
+	public StudentAndGradeService(StudentDao studentDao, MathGrade mathGrade, MathGradeDao mathGradeDao) {
 		this.studentDao = studentDao;
+		this.mathGrade = mathGrade;
+		this.mathGradeDao = mathGradeDao;
 	}
 
 
@@ -39,6 +45,21 @@ public class StudentAndGradeService {
 	}
 
 	public boolean createGrade(double grade, int studentId, String subject) {
+		if (!checkIfStudentIsNull(studentId)) {
+			return false;
+		}
+
+		if (grade < 0.0 || grade > 100.0) {
+			return false;
+		}
+
+		if ("math".equalsIgnoreCase(subject)) {
+			mathGrade.setGrade(grade);
+			mathGrade.setStudentId(studentId);
+			mathGradeDao.save(mathGrade);
+			return true;
+		}
+
 		return false;
 	}
 }
