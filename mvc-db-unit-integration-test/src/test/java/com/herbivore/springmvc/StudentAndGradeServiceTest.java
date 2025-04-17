@@ -57,6 +57,13 @@ class StudentAndGradeServiceTest {
 				VALUES ('Tom', 'Riddle', 'hi-im-tom@gmail.com')""";
 		jdbcTemplate.execute(sql);
 //		studentService.createStudent("Tom", "Riddle", "hi-im-tom@gmail.com");
+
+		jdbcTemplate.execute("INSERT INTO math_grade (student_id, grade) " +
+							 "VALUES (1, 100.00)");
+		jdbcTemplate.execute("INSERT INTO science_grade (student_id, grade) " +
+							 "VALUES (1, 100.00)");
+		jdbcTemplate.execute("INSERT INTO history_grade (student_id, grade) " +
+							 "VALUES (1, 100.00)");
 	}
 
 	@AfterEach
@@ -68,6 +75,14 @@ class StudentAndGradeServiceTest {
 
 		jdbcTemplate.execute(deleteSql);
 		jdbcTemplate.execute(resetIdSql);
+
+		jdbcTemplate.execute("DELETE FROM math_grade");
+		jdbcTemplate.execute("ALTER TABLE math_grade ALTER COLUMN id RESTART WITH 1");
+		jdbcTemplate.execute("DELETE FROM science_grade");
+		jdbcTemplate.execute("ALTER TABLE science_grade ALTER COLUMN id RESTART WITH 1");
+		jdbcTemplate.execute("DELETE FROM history_grade");
+		jdbcTemplate.execute("ALTER TABLE math_grade ALTER COLUMN id RESTART WITH 1");
+
 	}
 
 	@DisplayName("TTD for Service & DAO")
