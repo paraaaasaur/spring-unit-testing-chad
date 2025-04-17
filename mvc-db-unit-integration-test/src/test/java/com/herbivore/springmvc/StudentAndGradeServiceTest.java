@@ -2,9 +2,13 @@ package com.herbivore.springmvc;
 
 import com.herbivore.springmvc.model.CollegeStudent;
 import com.herbivore.springmvc.model.MathGrade;
+import com.herbivore.springmvc.repository.MathGradeDao;
 import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,13 +29,15 @@ class StudentAndGradeServiceTest {
 	private final StudentAndGradeService studentService;
 	private final StudentDao studentDao;
 	private final JdbcTemplate jdbcTemplate;
+	private final MathGradeDao mathGradeDao;
 
 
 	@Autowired
-	protected StudentAndGradeServiceTest(StudentAndGradeService studentService, StudentDao studentDao, JdbcTemplate jdbcTemplate) {
+	protected StudentAndGradeServiceTest(StudentAndGradeService studentService, StudentDao studentDao, JdbcTemplate jdbcTemplate, MathGradeDao mathGradeDao) {
 		this.studentService = studentService;
 		this.studentDao = studentDao;
 		this.jdbcTemplate = jdbcTemplate;
+		this.mathGradeDao = mathGradeDao;
 	}
 
 
