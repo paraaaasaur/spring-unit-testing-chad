@@ -1,9 +1,6 @@
 package com.herbivore.springmvc.service;
 
-import com.herbivore.springmvc.model.CollegeStudent;
-import com.herbivore.springmvc.model.HistoryGrade;
-import com.herbivore.springmvc.model.MathGrade;
-import com.herbivore.springmvc.model.ScienceGrade;
+import com.herbivore.springmvc.model.*;
 import com.herbivore.springmvc.repository.HistoryGradeDao;
 import com.herbivore.springmvc.repository.MathGradeDao;
 import com.herbivore.springmvc.repository.ScienceGradeDao;
@@ -85,5 +82,19 @@ public class StudentAndGradeService {
 		}
 
 		return false;
+	}
+
+	public int deleteGrade(int gradeId, Class<? extends Grade> gradeClazz) {
+		int studentId = 0;
+
+		if (gradeClazz == MathGrade.class) {
+			Optional<MathGrade> mathGrade = mathGradeDao.findById(gradeId);
+			if (mathGrade.isPresent()) {
+				studentId = mathGrade.get().getStudentId();
+				mathGradeDao.delete(mathGrade.get());
+			}
+		}
+
+		return studentId;
 	}
 }
