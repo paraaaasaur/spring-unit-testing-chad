@@ -147,4 +147,21 @@ class StudentAndGradeServiceTest {
 		assertTrue(scienceGrades.iterator().hasNext(), "Student#1 has science grade");
 		assertTrue(historyGrades.iterator().hasNext(), "Student#1 has history grade");
 	}
+
+	@DisplayName("Test Edge Cases for Grades")
+	@Test
+	void createGradeServiceReturnFalse() {
+		// false grade
+		assertFalse(studentService.createGrade(100.5, 1, "math"));
+		assertFalse(studentService.createGrade(-5.5, 1, "math"));
+		assertFalse(studentService.createGrade(Double.NaN, 1, "math"));
+		assertFalse(studentService.createGrade(Double.POSITIVE_INFINITY, 1, "math"));
+		assertFalse(studentService.createGrade(Double.NEGATIVE_INFINITY, 1, "math"));
+
+		// different ids
+		assertFalse(studentService.createGrade(80.5, 2, "math"));
+
+		// false subject
+		assertFalse(studentService.createGrade(100.5, 1, "literature"));
+	}
 }

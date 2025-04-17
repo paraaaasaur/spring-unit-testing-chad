@@ -61,29 +61,27 @@ public class StudentAndGradeService {
 			return false;
 		}
 
-		if (grade < 0.0 || grade > 100.0) {
-			return false;
-		}
+		if (grade < 100.0 && grade > 0.0) {
+			if ("math".equalsIgnoreCase(subject)) {
+				mathGrade.setGrade(grade);
+				mathGrade.setStudentId(studentId);
+				mathGradeDao.save(mathGrade);
+				return true;
+			}
 
-		if ("math".equalsIgnoreCase(subject)) {
-			mathGrade.setGrade(grade);
-			mathGrade.setStudentId(studentId);
-			mathGradeDao.save(mathGrade);
-			return true;
-		}
+			if ("science".equalsIgnoreCase(subject)) {
+				scienceGrade.setGrade(grade);
+				scienceGrade.setStudentId(studentId);
+				scienceGradeDao.save(scienceGrade);
+				return true;
+			}
 
-		if ("science".equalsIgnoreCase(subject)) {
-			scienceGrade.setGrade(grade);
-			scienceGrade.setStudentId(studentId);
-			scienceGradeDao.save(scienceGrade);
-			return true;
-		}
-
-		if ("history".equalsIgnoreCase(subject)) {
-			historyGrade.setGrade(grade);
-			historyGrade.setStudentId(studentId);
-			historyGradeDao.save(historyGrade);
-			return true;
+			if ("history".equalsIgnoreCase(subject)) {
+				historyGrade.setGrade(grade);
+				historyGrade.setStudentId(studentId);
+				historyGradeDao.save(historyGrade);
+				return true;
+			}
 		}
 
 		return false;
