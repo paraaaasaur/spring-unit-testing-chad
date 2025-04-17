@@ -181,4 +181,12 @@ class StudentAndGradeServiceTest {
 		// false subject
 		assertFalse(studentService.createGrade(100.5, 1, UNKNOWN));
 	}
+
+	@DisplayName("TDD for GradeService#delete-grade")
+	@Test
+	void deleteGradeService() {
+		// Return student id after deletion
+		int studentId = studentService.deleteGrade(1, MATH);
+		assertEquals(1, studentId);
+	}
 }
