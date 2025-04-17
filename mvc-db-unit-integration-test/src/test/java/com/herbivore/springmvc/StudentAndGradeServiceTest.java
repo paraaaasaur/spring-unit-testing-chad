@@ -1,8 +1,12 @@
 package com.herbivore.springmvc;
 
 import com.herbivore.springmvc.model.CollegeStudent;
+import com.herbivore.springmvc.model.HistoryGrade;
 import com.herbivore.springmvc.model.MathGrade;
+import com.herbivore.springmvc.model.ScienceGrade;
+import com.herbivore.springmvc.repository.HistoryGradeDao;
 import com.herbivore.springmvc.repository.MathGradeDao;
+import com.herbivore.springmvc.repository.ScienceGradeDao;
 import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
 import org.junit.jupiter.api.AfterEach;
@@ -19,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.herbivore.springmvc.model.Grade.Type.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 // rn just use the regular one
@@ -30,14 +35,18 @@ class StudentAndGradeServiceTest {
 	private final StudentDao studentDao;
 	private final JdbcTemplate jdbcTemplate;
 	private final MathGradeDao mathGradeDao;
+	private final ScienceGradeDao scienceGradeDao;
+	private final HistoryGradeDao historyGradeDao;
 
 
 	@Autowired
-	protected StudentAndGradeServiceTest(StudentAndGradeService studentService, StudentDao studentDao, JdbcTemplate jdbcTemplate, MathGradeDao mathGradeDao) {
+	protected StudentAndGradeServiceTest(StudentAndGradeService studentService, StudentDao studentDao, JdbcTemplate jdbcTemplate, MathGradeDao mathGradeDao, ScienceGradeDao scienceGradeDao, HistoryGradeDao historyGradeDao) {
 		this.studentService = studentService;
 		this.studentDao = studentDao;
 		this.jdbcTemplate = jdbcTemplate;
 		this.mathGradeDao = mathGradeDao;
+		this.scienceGradeDao = scienceGradeDao;
+		this.historyGradeDao = historyGradeDao;
 	}
 
 
@@ -125,12 +134,35 @@ class StudentAndGradeServiceTest {
 	void createGradeService() {
 
 		// Create the grade
-		assertTrue(studentService.createGrade(80.50, 1, "math"));
+		assertTrue(studentService.createGrade(80.50, 1, MATH));
+		assertTrue(studentService.createGrade(80.50, 1, SCIENCE));
+		assertTrue(studentService.createGrade(80.50, 1, HISTORY));
 
 		// Get all grades with studentId
 		Iterable<MathGrade> mathGrades = mathGradeDao.findGradeByStudentId(1);
+		Iterable<ScienceGrade> scienceGrades = scienceGradeDao.findGradeByStudentId(1);
+		Iterable<HistoryGrade> historyGrades = historyGradeDao.findGradeByStudentId(1);
 
 		// Verify there are grades
 		assertTrue(mathGrades.iterator().hasNext(), "Student#1 has math grade");
+		assertTrue(scienceGrades.iterator().hasNext(), "Student#1 has science grade");
+		assertTrue(historyGrades.iterator().hasNext(), "Student#1 has history grade");
+	}
+
+	@DisplayName("Test Edge Cases for Grades")
+	@Test
+	void createGradeServiceReturnFalse() {
+		// false grade
+		assertFalse(studentService.createGrade(100.5, 1, MATH));
+		assertFalse(studentService.createGrade(-5.5, 1, MATH));
+		assertFalse(studentService.createGrade(Double.NaN, 1, MATH));
+		assertFalse(studentService.createGrade(Double.POSITIVE_INFINITY, 1, MATH));
+		assertFalse(studentService.createGrade(Double.NEGATIVE_INFINITY, 1, MATH));
+
+		// different ids
+		assertFalse(studentService.createGrade(80.5, 2, MATH));
+
+		// false subject
+		assertFalse(studentService.createGrade(100.5, 1, UNKNOWN));
 	}
 }

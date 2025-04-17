@@ -1,6 +1,9 @@
 package com.herbivore.springmvc.service;
 
-import com.herbivore.springmvc.model.CollegeStudent;
+import com.herbivore.springmvc.model.*;
+import com.herbivore.springmvc.repository.HistoryGradeDao;
+import com.herbivore.springmvc.repository.MathGradeDao;
+import com.herbivore.springmvc.repository.ScienceGradeDao;
 import com.herbivore.springmvc.repository.StudentDao;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,10 +14,16 @@ import java.util.Optional;
 @Transactional
 public class StudentAndGradeService {
 	private final StudentDao studentDao;
+	private final MathGradeDao mathGradeDao;
+	private final ScienceGradeDao scienceGradeDao;
+	private final HistoryGradeDao historyGradeDao;
 
 
-	public StudentAndGradeService(StudentDao studentDao) {
+	public StudentAndGradeService(StudentDao studentDao, MathGradeDao mathGradeDao, ScienceGradeDao scienceGradeDao, HistoryGradeDao historyGradeDao) {
 		this.studentDao = studentDao;
+		this.mathGradeDao = mathGradeDao;
+		this.scienceGradeDao = scienceGradeDao;
+		this.historyGradeDao = historyGradeDao;
 	}
 
 
@@ -37,7 +46,40 @@ public class StudentAndGradeService {
 		return studentDao.findAll();
 	}
 
-	public boolean createGrade(double grade, int studentId, String subject) {
-		return false;
+	public boolean createGrade(double grade, int studentId, Grade.Type gradeType) {
+		// 1. validate conditions
+		boolean valid = (grade >= 0.0 && grade <= 100.0) && isStudentFound(studentId);
+		if (!valid) return false;
+
+		// 2. create grade entity & save to DB
+		switch (gradeType) {
+			case HISTORY -> {
+				HistoryGrade historyGrade = new HistoryGrade();
+				//				historyGrade.setId(0);
+				historyGrade.setGrade(grade);
+				historyGrade.setStudentId(studentId);
+				historyGradeDao.save(historyGrade);
+			}
+			case MATH -> {
+				MathGrade mathGrade = new MathGrade();
+				//				mathGrade.setId(0);
+				mathGrade.setGrade(grade);
+				mathGrade.setStudentId(studentId);
+				mathGradeDao.save(mathGrade);
+			}
+			case SCIENCE -> {
+				ScienceGrade scienceGrade = new ScienceGrade();
+				//				scienceGrade.setId(0);
+				scienceGrade.setGrade(grade);
+				scienceGrade.setStudentId(studentId);
+				scienceGradeDao.save(scienceGrade);
+			}
+			default -> {
+				return false;
+			}
+		}
+
+
+		return true;
 	}
 }
