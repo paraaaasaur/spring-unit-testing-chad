@@ -36,4 +36,8 @@ public class StudentAndGradeService {
 	public Iterable<CollegeStudent> getGradebook() {
 		return studentDao.findAll();
 	}
+
+	public boolean createGrade(double grade, int studentId, String subject) {
+		return false;
+	}
 }
