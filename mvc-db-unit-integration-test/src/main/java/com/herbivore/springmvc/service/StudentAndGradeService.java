@@ -8,6 +8,8 @@ import com.herbivore.springmvc.repository.StudentDao;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,9 +22,10 @@ public class StudentAndGradeService {
 	private final ScienceGradeDao scienceGradeDao;
 	private final HistoryGrade historyGrade;
 	private final HistoryGradeDao historyGradeDao;
+	private final StudentGrades studentGrades;
 
 
-	public StudentAndGradeService(StudentDao studentDao, MathGrade mathGrade, MathGradeDao mathGradeDao, ScienceGrade scienceGrade, ScienceGradeDao scienceGradeDao, HistoryGrade historyGrade, HistoryGradeDao historyGradeDao) {
+	public StudentAndGradeService(StudentDao studentDao, MathGrade mathGrade, MathGradeDao mathGradeDao, ScienceGrade scienceGrade, ScienceGradeDao scienceGradeDao, HistoryGrade historyGrade, HistoryGradeDao historyGradeDao, StudentGrades studentGrades) {
 		this.studentDao = studentDao;
 		this.mathGrade = mathGrade;
 		this.mathGradeDao = mathGradeDao;
@@ -30,6 +33,7 @@ public class StudentAndGradeService {
 		this.scienceGradeDao = scienceGradeDao;
 		this.historyGrade = historyGrade;
 		this.historyGradeDao = historyGradeDao;
+		this.studentGrades = studentGrades;
 	}
 
 
@@ -120,6 +124,34 @@ public class StudentAndGradeService {
 	}
 
 	public GradebookCollegeStudent studentInformation(int studentId) {
-		return null;
+		CollegeStudent student = studentDao.findById(studentId).orElse(null);
+
+		if (student == null) {
+			return null;
+		}
+
+		var historyGrades = historyGradeDao.findGradeByStudentId(studentId);
+		var mathGrades = mathGradeDao.findGradeByStudentId(studentId);
+		var scienceGrades = scienceGradeDao.findGradeByStudentId(studentId);
+
+		List<Grade> historyGradeList = new ArrayList<>();
+		List<Grade> mathGradeList = new ArrayList<>();
+		List<Grade> scienceGradeList = new ArrayList<>();
+
+		historyGrades.forEach(historyGradeList::add);
+		mathGrades.forEach(mathGradeList::add);
+		scienceGrades.forEach(scienceGradeList::add);
+
+		studentGrades.setHistoryGradeResults(historyGradeList);
+		studentGrades.setMathGradeResults(mathGradeList);
+		studentGrades.setScienceGradeResults(scienceGradeList);
+
+		return new GradebookCollegeStudent(
+				student.getId(),
+				student.getFirstname(),
+				student.getLastname(),
+				student.getEmailAddress(),
+				this.studentGrades
+		);
 	}
 }
