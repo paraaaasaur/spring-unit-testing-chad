@@ -118,4 +118,8 @@ public class StudentAndGradeService {
 
 		return studentId;
 	}
+
+	public GradebookCollegeStudent studentInformation(int studentId) {
+		return null;
+	}
 }

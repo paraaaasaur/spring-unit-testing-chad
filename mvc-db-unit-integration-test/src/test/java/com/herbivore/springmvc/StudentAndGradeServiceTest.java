@@ -1,9 +1,6 @@
 package com.herbivore.springmvc;
 
-import com.herbivore.springmvc.model.CollegeStudent;
-import com.herbivore.springmvc.model.HistoryGrade;
-import com.herbivore.springmvc.model.MathGrade;
-import com.herbivore.springmvc.model.ScienceGrade;
+import com.herbivore.springmvc.model.*;
 import com.herbivore.springmvc.repository.HistoryGradeDao;
 import com.herbivore.springmvc.repository.MathGradeDao;
 import com.herbivore.springmvc.repository.ScienceGradeDao;
@@ -208,5 +205,20 @@ class StudentAndGradeServiceTest {
 	@Test
 	void deleteGradeServiceReturnStudentIdOfZero() {
 		assertEquals(0, studentService.deleteGrade(-1, MathGrade.class));
+	}
+
+	@DisplayName("Retrieve Student Information")
+	@Test
+	void studentInformation() {
+		GradebookCollegeStudent gcs = studentService.studentInformation(1);
+
+		assertNotNull(gcs);
+		assertEquals(1, gcs.getId());
+		assertEquals("Tom", gcs.getFirstname());
+		assertEquals("Riddle", gcs.getLastname());
+		assertEquals("hi-im-tom@gmail.com", gcs.getEmailAddress());
+		assertEquals(1, gcs.getStudentGrades().getHistoryGradeResults().size());
+		assertEquals(1, gcs.getStudentGrades().getMathGradeResults().size());
+		assertEquals(1, gcs.getStudentGrades().getScienceGradeResults().size());
 	}
 }
