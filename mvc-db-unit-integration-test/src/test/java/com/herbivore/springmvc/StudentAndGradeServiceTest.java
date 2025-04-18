@@ -161,7 +161,7 @@ class StudentAndGradeServiceTest {
 		assertTrue(((Collection<HistoryGrade>)historyGrades).size() == 2, "Student#1 has history grade");
 	}
 
-	@DisplayName("Test Edge Cases for Grades")
+	@DisplayName("Test Edge Cases for Creating Grades")
 	@Test
 	void createGradeServiceReturnFalse() {
 		// false grade
@@ -190,5 +190,11 @@ class StudentAndGradeServiceTest {
 
 		int studentIdFromHistory = studentService.deleteGrade(1, HistoryGrade.class);
 		assertEquals(1, studentIdFromHistory);
+	}
+
+	@DisplayName("Edge Cases: Invalid Grade ID for Deleting Grades")
+	@Test
+	void deleteGradeServiceReturnStudentIdOfZero() {
+		assertEquals(0, studentService.deleteGrade(-1, MathGrade.class));
 	}
 }
