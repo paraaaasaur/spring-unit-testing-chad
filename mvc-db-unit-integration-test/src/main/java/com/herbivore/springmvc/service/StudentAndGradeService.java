@@ -95,6 +95,22 @@ public class StudentAndGradeService {
 			}
 		}
 
+		if (gradeClazz == ScienceGrade.class) {
+			Optional<ScienceGrade> scienceGrade = scienceGradeDao.findById(gradeId);
+			if (scienceGrade.isPresent()) {
+				studentId = scienceGrade.get().getStudentId();
+				scienceGradeDao.delete(scienceGrade.get());
+			}
+		}
+
+		if (gradeClazz == HistoryGrade.class) {
+			Optional<HistoryGrade> historyGrade = historyGradeDao.findById(gradeId);
+			if (historyGrade.isPresent()) {
+				studentId = historyGrade.get().getStudentId();
+				historyGradeDao.delete(historyGrade.get());
+			}
+		}
+
 		return studentId;
 	}
 }
