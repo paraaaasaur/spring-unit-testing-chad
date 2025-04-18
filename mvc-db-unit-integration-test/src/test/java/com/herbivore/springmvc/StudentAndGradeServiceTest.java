@@ -9,7 +9,10 @@ import com.herbivore.springmvc.repository.MathGradeDao;
 import com.herbivore.springmvc.repository.ScienceGradeDao;
 import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -110,6 +113,11 @@ class StudentAndGradeServiceTest {
 		students.forEach(System.out::println);
 	}
 
+	/**
+	 * 1. Delete a student<br>
+	 * 2. Establish delete-on-cascade so that deletes
+	 *    all grades from the student as well<br>
+	 **/
 	@DisplayName("TTD for Service#Delete-Student")
 	@Test
 	void deleteStudentService() {
@@ -120,6 +128,10 @@ class StudentAndGradeServiceTest {
 		studentService.deleteStudent(1);
 
 		studentOp = studentDao.findById(1);
+
+		assertFalse(historyGradeDao.findGradeByStudentId(1).iterator().hasNext());
+		assertFalse(mathGradeDao.findGradeByStudentId(1).iterator().hasNext());
+		assertFalse(scienceGradeDao.findGradeByStudentId(1).iterator().hasNext());
 
 		assertFalse(studentOp.isPresent(), "Student#1 should've been deleted");
 	}
