@@ -8,7 +8,9 @@ import com.herbivore.springmvc.repository.StudentDao;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import static com.herbivore.springmvc.model.Grade.Type.*;
 
@@ -40,8 +42,13 @@ public class StudentAndGradeService {
 	}
 
 	public void deleteStudent(int id) {
-		if (isStudentFound(id))
+		if (isStudentFound(id)) {
+			historyGradeDao.deleteByStudentId(id);
+			mathGradeDao.deleteByStudentId(id);
+			scienceGradeDao.deleteByStudentId(id);
+
 			studentDao.deleteById(id);
+		}
 	}
 
 	public Iterable<CollegeStudent> getGradebook() {
@@ -113,5 +120,32 @@ public class StudentAndGradeService {
 		}
 
 		return studentId;
+	}
+
+	public GradesAndCollegeStudent studentInformation(int studentId) {
+		CollegeStudent student = studentDao.findById(studentId).orElse(null);
+
+		if (student == null) {
+			return null;
+		}
+
+		var historyGradeList = iterToList(historyGradeDao.findGradeByStudentId(studentId));
+		var mathGradeList = iterToList(mathGradeDao.findGradeByStudentId(studentId));
+		var scienceGradeList = iterToList(scienceGradeDao.findGradeByStudentId(studentId));
+
+		StudentGrades studentGrades = new StudentGrades();
+		studentGrades.setHistoryGradeResults(historyGradeList);
+		studentGrades.setMathGradeResults(mathGradeList);
+		studentGrades.setScienceGradeResults(scienceGradeList);
+
+
+		return new GradesAndCollegeStudent(studentGrades, student);
+	}
+
+
+	// helper methods
+	private <T extends Grade> List<T> iterToList(Iterable<T> iterable) {
+		return StreamSupport.stream(iterable.spliterator(), false)
+				.toList();
 	}
 }

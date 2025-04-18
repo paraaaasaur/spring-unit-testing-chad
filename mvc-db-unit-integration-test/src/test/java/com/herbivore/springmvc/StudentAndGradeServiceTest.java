@@ -1,15 +1,15 @@
 package com.herbivore.springmvc;
 
-import com.herbivore.springmvc.model.CollegeStudent;
-import com.herbivore.springmvc.model.HistoryGrade;
-import com.herbivore.springmvc.model.MathGrade;
-import com.herbivore.springmvc.model.ScienceGrade;
+import com.herbivore.springmvc.model.*;
 import com.herbivore.springmvc.repository.HistoryGradeDao;
 import com.herbivore.springmvc.repository.MathGradeDao;
 import com.herbivore.springmvc.repository.ScienceGradeDao;
 import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -111,6 +111,11 @@ class StudentAndGradeServiceTest {
 		students.forEach(System.out::println);
 	}
 
+	/**
+	 * 1. Delete a student<br>
+	 * 2. Establish delete-on-cascade so that deletes
+	 *    all grades from the student as well<br>
+	 **/
 	@DisplayName("TTD for Service#Delete-Student")
 	@Test
 	void deleteStudentService() {
@@ -121,6 +126,10 @@ class StudentAndGradeServiceTest {
 		studentService.deleteStudent(1);
 
 		studentOp = studentDao.findById(1);
+
+		assertFalse(historyGradeDao.findGradeByStudentId(1).iterator().hasNext());
+		assertFalse(mathGradeDao.findGradeByStudentId(1).iterator().hasNext());
+		assertFalse(scienceGradeDao.findGradeByStudentId(1).iterator().hasNext());
 
 		assertFalse(studentOp.isPresent(), "Student#1 should've been deleted");
 	}
@@ -162,7 +171,7 @@ class StudentAndGradeServiceTest {
 		assertTrue(((Collection<HistoryGrade>)historyGrades).size() == 2, "Student#1 has history grade");
 	}
 
-	@DisplayName("Test Edge Cases for Grades")
+	@DisplayName("Test Edge Cases for Creating Grades")
 	@Test
 	void createGradeServiceReturnFalse() {
 		// false grade
@@ -191,5 +200,26 @@ class StudentAndGradeServiceTest {
 
 		int studentIdFromHistory = studentService.deleteGrade(1, HISTORY);
 		assertEquals(1, studentIdFromHistory);
+	}
+
+	@DisplayName("Edge Cases: Invalid Grade ID for Deleting Grades")
+	@Test
+	void deleteGradeServiceReturnStudentIdOfZero() {
+		assertEquals(0, studentService.deleteGrade(-1, MATH));
+	}
+
+	@DisplayName("Retrieve Student Information")
+	@Test
+	void studentInformation() {
+		GradesAndCollegeStudent gcs = studentService.studentInformation(1);
+
+		assertNotNull(gcs);
+		assertEquals(1, gcs.collegeStudent().getId());
+		assertEquals("Tom", gcs.collegeStudent().getFirstname());
+		assertEquals("Riddle", gcs.collegeStudent().getLastname());
+		assertEquals("hi-im-tom@gmail.com", gcs.collegeStudent().getEmailAddress());
+		assertEquals(1, gcs.studentGrades().getHistoryGradeResults().size());
+		assertEquals(1, gcs.studentGrades().getMathGradeResults().size());
+		assertEquals(1, gcs.studentGrades().getScienceGradeResults().size());
 	}
 }
