@@ -82,7 +82,7 @@ class StudentAndGradeServiceTest {
 		jdbcTemplate.execute("DELETE FROM science_grade");
 		jdbcTemplate.execute("ALTER TABLE science_grade ALTER COLUMN id RESTART WITH 1");
 		jdbcTemplate.execute("DELETE FROM history_grade");
-		jdbcTemplate.execute("ALTER TABLE math_grade ALTER COLUMN id RESTART WITH 1");
+		jdbcTemplate.execute("ALTER TABLE history_grade ALTER COLUMN id RESTART WITH 1");
 
 	}
 
