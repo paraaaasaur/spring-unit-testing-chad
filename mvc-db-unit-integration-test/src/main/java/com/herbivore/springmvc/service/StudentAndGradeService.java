@@ -64,23 +64,23 @@ public class StudentAndGradeService {
 		switch (gradeType) {
 			case HISTORY -> {
 				HistoryGrade historyGrade = new HistoryGrade();
-				//				historyGrade.setId(0);
-				historyGrade.setGrade(grade);
-				historyGrade.setStudentId(studentId);
+	//				historyGrade.setId(0);
+					historyGrade.setGrade(grade);
+					historyGrade.setStudentId(studentId);
 				historyGradeDao.save(historyGrade);
 			}
 			case MATH -> {
 				MathGrade mathGrade = new MathGrade();
-				//				mathGrade.setId(0);
-				mathGrade.setGrade(grade);
-				mathGrade.setStudentId(studentId);
+	//				mathGrade.setId(0);
+					mathGrade.setGrade(grade);
+					mathGrade.setStudentId(studentId);
 				mathGradeDao.save(mathGrade);
 			}
 			case SCIENCE -> {
 				ScienceGrade scienceGrade = new ScienceGrade();
-				//				scienceGrade.setId(0);
-				scienceGrade.setGrade(grade);
-				scienceGrade.setStudentId(studentId);
+	//				scienceGrade.setId(0);
+					scienceGrade.setGrade(grade);
+					scienceGrade.setStudentId(studentId);
 				scienceGradeDao.save(scienceGrade);
 			}
 			default -> {

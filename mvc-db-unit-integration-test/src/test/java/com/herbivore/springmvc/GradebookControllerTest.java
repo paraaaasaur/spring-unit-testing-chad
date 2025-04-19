@@ -6,6 +6,7 @@ import com.herbivore.springmvc.service.StudentAndGradeService;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -38,7 +39,24 @@ public class GradebookControllerTest {
 	private static MockHttpServletRequest requestMock;
 	private final StudentDao studentDao;
 
+	@Value("${sql.script.create.student}")
+	private String createStudentSql;
+	@Value("${sql.script.create.grade.history}")
+	private String createHistoryGradeSql;
+	@Value("${sql.script.create.grade.math}")
+	private String createMathGradeSql;
+	@Value("${sql.script.create.grade.science}")
+	private String createScienceGradeSql;
+	@Value("${sql.script.delete.student}")
+	private String deleteStudentSql;
+	@Value("${sql.script.delete.grade.history}")
+	private String deleteHistoryGradeSql;
+	@Value("${sql.script.delete.grade.math}")
+	private String deleteMathGradeSql;
+	@Value("${sql.script.delete.grade.science}")
+	private String deleteScienceGradeSql;
 
+	
 	@Autowired
 	public GradebookControllerTest(JdbcTemplate jdbcTemplate, MockMvc mockMvc, StudentDao studentDao) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -61,22 +79,18 @@ public class GradebookControllerTest {
 
 	@BeforeEach
 	void setup() {
-		final String sql = """
-				INSERT INTO student
-				(firstname, lastname, email_address)
-				VALUES ('Tom', 'Riddle', 'hi-im-tom@gmail.com')""";
-		jdbcTemplate.execute(sql);
+		jdbcTemplate.execute(createStudentSql);
+		jdbcTemplate.execute(createHistoryGradeSql);
+		jdbcTemplate.execute(createMathGradeSql);
+		jdbcTemplate.execute(createScienceGradeSql);
 	}
 
 	@AfterEach
 	void cleanUpAfterTransaction() {
-		final String deleteSql = "DELETE FROM student";
-		final String resetIdSql = """
-				ALTER TABLE student
-				ALTER COLUMN id RESTART WITH 1""";
-
-		jdbcTemplate.execute(deleteSql);
-		jdbcTemplate.execute(resetIdSql);
+		jdbcTemplate.execute(deleteStudentSql);
+		jdbcTemplate.execute(deleteHistoryGradeSql);
+		jdbcTemplate.execute(deleteMathGradeSql);
+		jdbcTemplate.execute(deleteScienceGradeSql);
 	}
 
 	/**
@@ -110,11 +124,11 @@ public class GradebookControllerTest {
 						.param("firstname", "John")
 						.param("lastname", "Doe")
 						.param("emailAddress", "jd@gmail.com"))
-				.andExpect(status().isOk())
+				.andExpect(status().is3xxRedirection())
 				.andReturn();
 
 		ModelAndView mav = mvcResult.getModelAndView();
-		ModelAndViewAssert.assertViewName(mav, "index");
+		ModelAndViewAssert.assertViewName(mav, "redirect:/");
 
 
 		// 2. Functionality check: create student
@@ -155,6 +169,28 @@ public class GradebookControllerTest {
 	void deleteStudentHttpRequestErrorPage() throws Exception {
 		final String endpoint = "/delete/student/{id}";
 		MvcResult mvcResult = mockMvc.perform(post(endpoint, 0))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		ModelAndView mav = mvcResult.getModelAndView();
+		ModelAndViewAssert.assertViewName(mav, "error");
+	}
+
+	@DisplayName("TDD for #studentInformation Happy Route")
+	@Test
+	void studentInformationHttpRequest() throws Exception {
+		MvcResult mvcResult = mockMvc.perform(get("/studentInformation/{id}", 1))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		ModelAndView mav = mvcResult.getModelAndView();
+		ModelAndViewAssert.assertViewName(mav, "studentInformation");
+	}
+
+	@DisplayName("TDD for #studentInformation Error Route")
+	@Test
+	void studentInformationHttpStudentDoesNotExistRequest() throws Exception {
+		MvcResult mvcResult = mockMvc.perform(get("/studentInformation/{id}", 0))
 				.andExpect(status().isOk())
 				.andReturn();
 

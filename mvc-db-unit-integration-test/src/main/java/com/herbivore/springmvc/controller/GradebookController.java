@@ -1,19 +1,24 @@
 package com.herbivore.springmvc.controller;
 
 import com.herbivore.springmvc.model.CollegeStudent;
+import com.herbivore.springmvc.model.Grade;
+import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+
 @Controller
 public class GradebookController {
 	private final StudentAndGradeService studentAndGradeService;
+	private final StudentDao studentDao;
 
 	@Autowired
-	public GradebookController(StudentAndGradeService studentAndGradeService) {
+	public GradebookController(StudentAndGradeService studentAndGradeService, StudentDao studentDao) {
 		this.studentAndGradeService = studentAndGradeService;
+		this.studentDao = studentDao;
 	}
 
 
@@ -52,6 +57,35 @@ public class GradebookController {
 
 	@GetMapping("/studentInformation/{id}")
 	public String studentInformation(@PathVariable int id, Model model) {
+		var dbStudentOpt = studentDao.findById(id);
+		if (dbStudentOpt.isEmpty()) {
+			return "error";
+		}
+
+		var gcs = studentAndGradeService.studentInformation(id);
+		model.addAttribute("student", gcs);
+
+
+		final var historyResults = gcs.studentGrades().getHistoryGradeResults();
+		final var mathResults = gcs.studentGrades().getMathGradeResults();
+		final var scienceResults = gcs.studentGrades().getScienceGradeResults();
+
+		var historyAverage = historyResults.isEmpty()?
+				"N/A" :
+				Grade.avgGrades(historyResults);
+		model.addAttribute("historyAverage", historyAverage);
+
+		var mathAverage = mathResults.isEmpty()?
+				"N/A" :
+				Grade.avgGrades(mathResults);
+		model.addAttribute("mathAverage", mathAverage);
+
+		var scienceAverage = scienceResults.isEmpty()?
+				"N/A" :
+				Grade.avgGrades(scienceResults);
+		model.addAttribute("scienceAverage", scienceAverage);
+
+
 		return "studentInformation";
 	}
 }

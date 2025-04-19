@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
@@ -36,6 +37,23 @@ class StudentAndGradeServiceTest {
 	private final ScienceGradeDao scienceGradeDao;
 	private final HistoryGradeDao historyGradeDao;
 
+	@Value("${sql.script.create.student}")
+	private String createStudentSql;
+	@Value("${sql.script.create.grade.history}")
+	private String createHistoryGradeSql;
+	@Value("${sql.script.create.grade.math}")
+	private String createMathGradeSql;
+	@Value("${sql.script.create.grade.science}")
+	private String createScienceGradeSql;
+	@Value("${sql.script.delete.student}")
+	private String deleteStudentSql;
+	@Value("${sql.script.delete.grade.history}")
+	private String deleteHistoryGradeSql;
+	@Value("${sql.script.delete.grade.math}")
+	private String deleteMathGradeSql;
+	@Value("${sql.script.delete.grade.science}")
+	private String deleteScienceGradeSql;
+
 
 	@Autowired
 	protected StudentAndGradeServiceTest(StudentAndGradeService studentService, StudentDao studentDao, JdbcTemplate jdbcTemplate, MathGradeDao mathGradeDao, ScienceGradeDao scienceGradeDao, HistoryGradeDao historyGradeDao) {
@@ -47,40 +65,20 @@ class StudentAndGradeServiceTest {
 		this.historyGradeDao = historyGradeDao;
 	}
 
-
 	@BeforeEach
 	void setUpDatabase() {
-		final String sql = """
-				INSERT INTO student
-				(firstname, lastname, email_address)
-				VALUES ('Tom', 'Riddle', 'hi-im-tom@gmail.com')""";
-		jdbcTemplate.execute(sql);
-//		studentService.createStudent("Tom", "Riddle", "hi-im-tom@gmail.com");
-
-		jdbcTemplate.execute("INSERT INTO math_grade (student_id, grade) " +
-							 "VALUES (1, 100.00)");
-		jdbcTemplate.execute("INSERT INTO science_grade (student_id, grade) " +
-							 "VALUES (1, 100.00)");
-		jdbcTemplate.execute("INSERT INTO history_grade (student_id, grade) " +
-							 "VALUES (1, 100.00)");
+		jdbcTemplate.execute(createStudentSql);
+		jdbcTemplate.execute(createHistoryGradeSql);
+		jdbcTemplate.execute(createMathGradeSql);
+		jdbcTemplate.execute(createScienceGradeSql);
 	}
 
 	@AfterEach
 	void cleanUpAfterTransaction() {
-		final String deleteSql = "DELETE FROM student";
-		final String resetIdSql = """
-				ALTER TABLE student
-				ALTER COLUMN id RESTART WITH 1""";
-
-		jdbcTemplate.execute(deleteSql);
-		jdbcTemplate.execute(resetIdSql);
-
-		jdbcTemplate.execute("DELETE FROM math_grade");
-		jdbcTemplate.execute("ALTER TABLE math_grade ALTER COLUMN id RESTART WITH 1");
-		jdbcTemplate.execute("DELETE FROM science_grade");
-		jdbcTemplate.execute("ALTER TABLE science_grade ALTER COLUMN id RESTART WITH 1");
-		jdbcTemplate.execute("DELETE FROM history_grade");
-		jdbcTemplate.execute("ALTER TABLE history_grade ALTER COLUMN id RESTART WITH 1");
+		jdbcTemplate.execute(deleteStudentSql);
+		jdbcTemplate.execute(deleteHistoryGradeSql);
+		jdbcTemplate.execute(deleteMathGradeSql);
+		jdbcTemplate.execute(deleteScienceGradeSql);
 
 	}
 
@@ -89,8 +87,7 @@ class StudentAndGradeServiceTest {
 	void createStudentService() {
 		CollegeStudent student = studentDao.findByEmailAddress("hi-im-tom@gmail.com");
 
-		String expected = "hi-im-tom@gmail.uk";
-//		String expected = "hi-im-tom@gmail.com";
+		String expected = "hi-im-tom@gmail.com";
 		String actual = student.getEmailAddress();
 
 		assertEquals(expected, actual, "find by email");
