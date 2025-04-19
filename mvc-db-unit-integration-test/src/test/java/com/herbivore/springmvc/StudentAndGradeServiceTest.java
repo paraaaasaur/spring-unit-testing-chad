@@ -214,12 +214,20 @@ class StudentAndGradeServiceTest {
 		GradesAndCollegeStudent gcs = studentService.studentInformation(1);
 
 		assertNotNull(gcs);
-		assertEquals(1, gcs.collegeStudent().getId());
-		assertEquals("Tom", gcs.collegeStudent().getFirstname());
-		assertEquals("Riddle", gcs.collegeStudent().getLastname());
-		assertEquals("hi-im-tom@gmail.com", gcs.collegeStudent().getEmailAddress());
-		assertEquals(1, gcs.studentGrades().getHistoryGradeResults().size());
-		assertEquals(1, gcs.studentGrades().getMathGradeResults().size());
-		assertEquals(1, gcs.studentGrades().getScienceGradeResults().size());
+		assertEquals(1, gcs.getCollegeStudent().getId());
+		assertEquals("Tom", gcs.getCollegeStudent().getFirstname());
+		assertEquals("Riddle", gcs.getCollegeStudent().getLastname());
+		assertEquals("hi-im-tom@gmail.com", gcs.getCollegeStudent().getEmailAddress());
+		assertEquals(1, gcs.getStudentGrades().getHistoryGradeResults().size());
+		assertEquals(1, gcs.getStudentGrades().getMathGradeResults().size());
+		assertEquals(1, gcs.getStudentGrades().getScienceGradeResults().size());
+	}
+
+	@DisplayName("Edge Case for #studentInformation: Invalid Student")
+	@Test
+	void studentInformationServiceReturnNull() {
+		GradesAndCollegeStudent gcs = studentService.studentInformation(0);
+
+		assertNull(gcs);
 	}
 }
