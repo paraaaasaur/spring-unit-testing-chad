@@ -221,4 +221,12 @@ class StudentAndGradeServiceTest {
 		assertEquals(1, gcs.getStudentGrades().getMathGradeResults().size());
 		assertEquals(1, gcs.getStudentGrades().getScienceGradeResults().size());
 	}
+
+	@DisplayName("Edge Case for #studentInformation: Invalid Student")
+	@Test
+	void studentInformationServiceReturnNull() {
+		GradebookCollegeStudent gcs = studentService.studentInformation(0);
+
+		assertNull(gcs);
+	}
 }
