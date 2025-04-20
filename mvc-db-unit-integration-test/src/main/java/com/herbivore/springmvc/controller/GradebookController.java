@@ -68,7 +68,29 @@ public class GradebookController {
 		return "studentInformation";
 	}
 
-	// helper method
+	@PostMapping("/grades")
+	public String createGrades(
+			@RequestParam Grade.Type gradeType,
+			@RequestParam double grade,
+			@RequestParam int studentId,
+			Model model
+	) {
+//		System.out.println(gradeType + " " + grade + " " + studentId);
+		if (!studentAndGradeService.isStudentFound(studentId)) {
+			return "error";
+		}
+
+		if (!studentAndGradeService.createGrade(grade, studentId, gradeType)) {
+			return "error";
+		}
+
+		putGcsAndGradesToModel(studentId, model);
+
+		return "redirect:/studentInformation/" + studentId;
+	}
+
+
+	// helper methods
 	private void putGcsAndGradesToModel(int studentId, Model model) {
 		var gcs = studentAndGradeService.studentInformation(studentId);
 		model.addAttribute("student", gcs);
