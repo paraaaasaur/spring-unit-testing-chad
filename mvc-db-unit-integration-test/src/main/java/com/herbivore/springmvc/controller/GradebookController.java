@@ -62,7 +62,15 @@ public class GradebookController {
 			return "error";
 		}
 
-		var gcs = studentAndGradeService.studentInformation(id);
+		putGcsAndGradesToModel(id, model);
+
+
+		return "studentInformation";
+	}
+
+	// helper method
+	private void putGcsAndGradesToModel(int studentId, Model model) {
+		var gcs = studentAndGradeService.studentInformation(studentId);
 		model.addAttribute("student", gcs);
 
 
@@ -84,8 +92,5 @@ public class GradebookController {
 				"N/A" :
 				Grade.avgGrades(scienceResults);
 		model.addAttribute("scienceAverage", scienceAverage);
-
-
-		return "studentInformation";
 	}
 }
