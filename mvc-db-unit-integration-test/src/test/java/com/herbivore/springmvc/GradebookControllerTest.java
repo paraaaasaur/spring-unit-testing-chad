@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.TestPropertySource;
@@ -24,6 +23,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,6 +38,7 @@ public class GradebookControllerTest {
 	private StudentAndGradeService serviceMock;
 	private static MockHttpServletRequest requestMock;
 	private final StudentDao studentDao;
+	private final StudentAndGradeService studentService;
 
 	@Value("${sql.script.create.student}")
 	private String createStudentSql;
@@ -58,10 +59,11 @@ public class GradebookControllerTest {
 
 	
 	@Autowired
-	public GradebookControllerTest(JdbcTemplate jdbcTemplate, MockMvc mockMvc, StudentDao studentDao) {
+	public GradebookControllerTest(JdbcTemplate jdbcTemplate, MockMvc mockMvc, StudentDao studentDao, StudentAndGradeService studentService) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.mockMvc = mockMvc;
 		this.studentDao = studentDao;
+		this.studentService = studentService;
 	}
 
 	// reminder: @BeforeAll methods are always public static void
@@ -120,7 +122,7 @@ public class GradebookControllerTest {
 	void createStudentHttpRequest() throws Exception {
 		// 1. Pathway check: from entry(request) to exit("index.html")
 		MvcResult mvcResult = mockMvc.perform(post("/")
-						.contentType(MediaType.APPLICATION_JSON)
+						.contentType(APPLICATION_JSON)
 						.param("firstname", "John")
 						.param("lastname", "Doe")
 						.param("emailAddress", "jd@gmail.com"))
@@ -196,6 +198,41 @@ public class GradebookControllerTest {
 
 		ModelAndView mav = mvcResult.getModelAndView();
 		ModelAndViewAssert.assertViewName(mav, "error");
+	}
+
+	/**
+	 * 1. POST /grades endpoint existence<br>
+	 * 2. POST /grades functionality: creates grade based on request params<br>
+	 * 3. Redirect to... TODO
+	 **/
+	@DisplayName("TTD for POST /grades View Resolution & Functionality")
+	@Test
+	void createValidGradeHttpRequest() throws Exception {
+		// 0. verify initial
+		assertTrue(studentDao.findById(1).isPresent());
+
+		var gcs = studentService.studentInformation(1);
+		int actualSize = gcs.studentGrades().getMathGradeResults().size();
+		assertEquals(1, actualSize);
+
+
+		// 1. pathway & functionality check
+		MvcResult mvcResult = mockMvc
+				.perform(post("/grades")
+						.contentType(APPLICATION_JSON)
+						.param("gradeType", "MATH")
+						.param("grade", "85.00")
+						.param("studentId", "1"))
+				.andExpect(status().is3xxRedirection())
+				.andReturn();
+		ModelAndView mav = mvcResult.getModelAndView();
+		ModelAndViewAssert.assertViewName(mav, "redirect:/studentInformation/1");
+
+
+		// 2. verify after
+		gcs = studentService.studentInformation(1);
+		actualSize = gcs.studentGrades().getMathGradeResults().size();
+		assertEquals(2, actualSize);
 	}
 
 	private class Archived {
