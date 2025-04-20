@@ -235,6 +235,22 @@ public class GradebookControllerTest {
 		assertEquals(2, actualSize);
 	}
 
+	@DisplayName("POST /grades w/ Invalid Student ID")
+	@Test
+	void createValidGradeHttpRequestStudentDoesNotExistEmptyResponse() throws Exception {
+		MvcResult mvcResult = mockMvc
+				.perform(post("/grades")
+						.contentType(APPLICATION_JSON)
+						.param("gradeType", "HISTORY")
+						.param("grade", "95.00")
+						.param("studentId", "0"))
+				.andExpect(status().isOk())
+				.andReturn();
+		ModelAndView mav = mvcResult.getModelAndView();
+		ModelAndViewAssert.assertViewName(mav, "error");
+	}
+
+
 	private class Archived {
 		//		@DisplayName("Test Service Mock")
 //		@Test
