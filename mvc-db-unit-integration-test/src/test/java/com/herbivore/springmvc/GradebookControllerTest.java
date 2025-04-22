@@ -1,6 +1,7 @@
 package com.herbivore.springmvc;
 
 import com.herbivore.springmvc.model.CollegeStudent;
+import com.herbivore.springmvc.repository.MathGradeDao;
 import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
 import org.junit.jupiter.api.*;
@@ -39,6 +40,7 @@ public class GradebookControllerTest {
 	private static MockHttpServletRequest requestMock;
 	private final StudentDao studentDao;
 	private final StudentAndGradeService studentService;
+	private final MathGradeDao mathGradeDao;
 
 	@Value("${sql.script.create.student}")
 	private String createStudentSql;
@@ -57,13 +59,14 @@ public class GradebookControllerTest {
 	@Value("${sql.script.delete.grade.science}")
 	private String deleteScienceGradeSql;
 
-	
+
 	@Autowired
-	public GradebookControllerTest(JdbcTemplate jdbcTemplate, MockMvc mockMvc, StudentDao studentDao, StudentAndGradeService studentService) {
+	public GradebookControllerTest(JdbcTemplate jdbcTemplate, MockMvc mockMvc, StudentDao studentDao, StudentAndGradeService studentService, MathGradeDao mathGradeDao) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.mockMvc = mockMvc;
 		this.studentDao = studentDao;
 		this.studentService = studentService;
+		this.mathGradeDao = mathGradeDao;
 	}
 
 	// reminder: @BeforeAll methods are always public static void
@@ -212,7 +215,7 @@ public class GradebookControllerTest {
 		assertTrue(studentDao.findById(1).isPresent());
 
 		var gcs = studentService.studentInformation(1);
-		int actualSize = gcs.studentGrades().getMathGradeResults().size();
+		int actualSize = gcs.getStudentGrades().getMathGradeResults().size();
 		assertEquals(1, actualSize);
 
 
@@ -231,7 +234,7 @@ public class GradebookControllerTest {
 
 		// 2. verify after
 		gcs = studentService.studentInformation(1);
-		actualSize = gcs.studentGrades().getMathGradeResults().size();
+		actualSize = gcs.getStudentGrades().getMathGradeResults().size();
 		assertEquals(2, actualSize);
 	}
 
@@ -248,6 +251,40 @@ public class GradebookControllerTest {
 				.andReturn();
 		ModelAndView mav = mvcResult.getModelAndView();
 		ModelAndViewAssert.assertViewName(mav, "error");
+	}
+
+	@DisplayName("POST /grades w/ Invalid Grade Type")
+	@Test
+	void createInvalidGradeHttpRequestGradeTypeDoesNotExistEmptyResponse() throws Exception {
+		MvcResult mvcResult = mockMvc
+				.perform(post("/grades")
+						.contentType(APPLICATION_JSON)
+						.param("gradeType", "history")
+						.param("grade", "95.00")
+						.param("studentId", "1"))
+				.andExpect(status().isBadRequest())
+				.andReturn();
+
+//		System.out.println(">>>>>>> " + mvcResult.getResolvedException());
+	}
+
+	@DisplayName("TTD for Controller#Delete-Grade")
+	@Test
+	void deleteValidGradeHttpRequest() throws Exception {
+		// 1. verify initial
+		assertTrue(mathGradeDao.findById(1).isPresent());
+
+		// 2. pathway check
+		MvcResult mvcResult = mockMvc
+				// which invokes Service#deleteGrade()
+				.perform(post("/grades/{id}/{gradeType}", "1", "MATH"))
+				.andExpect(status().is3xxRedirection())
+				.andReturn();
+		ModelAndView mav = mvcResult.getModelAndView();
+		ModelAndViewAssert.assertViewName(mav, "redirect:/studentInformation/1");
+
+		// 3. functionality logic check
+		assertFalse(mathGradeDao.findById(1).isPresent());
 	}
 
 

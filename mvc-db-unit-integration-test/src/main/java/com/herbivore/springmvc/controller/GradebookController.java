@@ -89,6 +89,11 @@ public class GradebookController {
 		return "redirect:/studentInformation/" + studentId;
 	}
 
+	@PostMapping("/grades/{id}/{gradeType}")
+	public String deleteGrade(@PathVariable int id, @PathVariable Grade.Type gradeType) {
+		return "redirect:/studentInformation/" + id;
+	}
+
 
 	// helper methods
 	private void putGcsAndGradesToModel(int studentId, Model model) {
@@ -96,9 +101,9 @@ public class GradebookController {
 		model.addAttribute("student", gcs);
 
 
-		final var historyResults = gcs.studentGrades().getHistoryGradeResults();
-		final var mathResults = gcs.studentGrades().getMathGradeResults();
-		final var scienceResults = gcs.studentGrades().getScienceGradeResults();
+		final var historyResults = gcs.getStudentGrades().getHistoryGradeResults();
+		final var mathResults = gcs.getStudentGrades().getMathGradeResults();
+		final var scienceResults = gcs.getStudentGrades().getScienceGradeResults();
 
 		var historyAverage = historyResults.isEmpty()?
 				"N/A" :
