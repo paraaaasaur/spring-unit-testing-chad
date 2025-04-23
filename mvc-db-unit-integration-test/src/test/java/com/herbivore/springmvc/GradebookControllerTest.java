@@ -287,6 +287,22 @@ public class GradebookControllerTest {
 		assertFalse(mathGradeDao.findById(1).isPresent());
 	}
 
+	/** Grade doesn't exist -> neither does studentId (based on the contract)*/
+	@DisplayName("Controller#Delete-Grade w/ Invalid Grade ID")
+	@Test
+	void deleteByInvalidGradeIdHttpRequestResolvesErrorPage() throws Exception {
+		// 1. verify initial
+		assertFalse(mathGradeDao.findById(-1).isPresent());
+
+		// 2. pathway check
+		MvcResult mvcResult = mockMvc
+				.perform(post("/grades/{id}/{gradeType}", "-1", "MATH"))
+				.andExpect(status().isOk())
+				.andReturn();
+		ModelAndView mav = mvcResult.getModelAndView();
+		ModelAndViewAssert.assertViewName(mav, "error");
+	}
+
 
 	private class Archived {
 		//		@DisplayName("Test Service Mock")
