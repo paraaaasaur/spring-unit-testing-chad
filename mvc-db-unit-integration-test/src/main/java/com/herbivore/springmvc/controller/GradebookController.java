@@ -91,7 +91,13 @@ public class GradebookController {
 
 	@PostMapping("/grades/{id}/{gradeType}")
 	public String deleteGrade(@PathVariable int id, @PathVariable Grade.Type gradeType) {
-		return "redirect:/studentInformation/" + id;
+		int studentId = studentAndGradeService.deleteGrade(id, gradeType);
+		boolean success = studentId > 0;
+
+		return success?
+				"redirect:/studentInformation/" + studentId :
+				"error";
+//				"forward:/error";
 	}
 
 
