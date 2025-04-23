@@ -18,9 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -301,6 +299,23 @@ public class GradebookControllerTest {
 				.andReturn();
 		ModelAndView mav = mvcResult.getModelAndView();
 		ModelAndViewAssert.assertViewName(mav, "error");
+	}
+	@DisplayName("Controller#Delete-Grade w/ Invalid Grade Type")
+	@Test
+	void deleteByInvalidGradeTypeHttpRequestIsBadRequest() throws Exception {
+		mockMvc.perform(post("/grades/{id}/{gradeType}", "1", invalidGradeType()))
+				.andExpect(status().isBadRequest())
+				.andReturn();
+	}
+
+
+	// helper method
+	private String invalidGradeType() {
+		List<String> invalidGradeTypeStrings = List.of(
+				"math", "history", "LITERATURE", "ART", "JAPANESE"
+		);
+		int n = new Random().nextInt(0, invalidGradeTypeStrings.size());
+		return invalidGradeTypeStrings.get(n);
 	}
 
 
