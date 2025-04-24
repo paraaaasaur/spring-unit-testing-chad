@@ -40,6 +40,12 @@ public class GradebookController {
 		return "redirect:/";
 	}
 
+	@PostMapping("/delete/student/{id}")
+	public String deleteStudent(@PathVariable int id) {
+		studentAndGradeService.deleteStudent(id);
+		return "redirect:/";
+	}
+
 	@GetMapping("/studentInformation/{id}")
 	public String studentInformation(@PathVariable int id, Model model) {
 		return "studentInformation";
