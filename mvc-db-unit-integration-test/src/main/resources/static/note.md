@@ -21,3 +21,4 @@
    (Rerun the full test suite to make sure we didn't break anything!)
    - Before: `@TestPropertySource("/application.properties")`
    - After: `@TestPropertySource("/application-test.properties")`
+5. Replace H2 in-memory configs with MySQL
