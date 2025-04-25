@@ -7,7 +7,9 @@ import lombok.ToString;
 
 import java.util.Objects;
 
+import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
 
 @Entity @Table(name = "history_grade")
 @Getter @Setter @ToString
@@ -15,11 +17,16 @@ public class HistoryGrade implements Grade {
     @Id @GeneratedValue(strategy = IDENTITY)
     private int id;
 
+    @Column(name = "grade")
+    private double grade;
+
     @Column(name = "student_id")
     private int studentId;
 
-    @Column(name = "grade")
-    private double grade;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "student_id")
+    @Setter(PROTECTED) @ToString.Exclude
+    private CollegeStudent collegeStudent;
 
 
     public HistoryGrade() {}
@@ -27,6 +34,7 @@ public class HistoryGrade implements Grade {
     public HistoryGrade(double grade) {
         this.grade = grade;
     }
+
 
     public HistoryGrade(int studentId, double grade) {
         this.studentId = studentId;

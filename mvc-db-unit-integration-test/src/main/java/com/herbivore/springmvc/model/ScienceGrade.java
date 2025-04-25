@@ -8,6 +8,8 @@ import lombok.ToString;
 import java.util.Objects;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
+import static jakarta.persistence.FetchType.LAZY;
+import static lombok.AccessLevel.PROTECTED;
 
 @Entity @Table(name = "science_grade")
 @Getter @Setter @ToString
@@ -20,6 +22,11 @@ public class ScienceGrade implements Grade {
 
     @Column(name = "grade")
     private double grade;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "student_id")
+    @Setter(PROTECTED) @ToString.Exclude
+    private CollegeStudent collegeStudent;
 
 
     public ScienceGrade() {}

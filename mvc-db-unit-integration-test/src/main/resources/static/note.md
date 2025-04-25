@@ -34,7 +34,7 @@ Use StudentAndGradeServiceTest#deleteStudentService test to verify the functiona
 
 ### Steps
 1. ✅ Remove inline cascade-on-delete in StudentAndGradeService#deleteStudentService
-2. Set up JPA associations for model classes
+2. ✅ Set up JPA associations for model classes
    - CollegeStudent: @OneToMany + cascade-remove
    - HistoryGrade, MathGrade, ScienceGrade: @ManyToOne
    - Define convenience methods to make sure both sides are in-sync
