@@ -25,9 +25,7 @@ import java.util.Optional;
 import static com.herbivore.springmvc.model.Grade.Type.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-// rn just use the regular one
-// can switch to test-dedicated one in the future
-@TestPropertySource("/application.properties")
+@TestPropertySource("/application-test.properties")
 @SpringBootTest
 class StudentAndGradeServiceTest {
 	private final StudentAndGradeService studentService;
