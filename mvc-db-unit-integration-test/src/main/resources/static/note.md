@@ -22,3 +22,9 @@
    - Before: `@TestPropertySource("/application.properties")`
    - After: `@TestPropertySource("/application-test.properties")`
 5. Replace H2 in-memory configs with MySQL
+
+## MySQL Database Setup
+Use _main/resources/db/create_mysql_database_script_my_version.sql_ to
+- Create db (`spring-testing`)
+- Create tables (`student` `history_grade` `math_grade` `science_grade`)
+- Insert initial data
