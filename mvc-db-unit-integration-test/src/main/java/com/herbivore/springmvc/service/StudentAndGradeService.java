@@ -43,10 +43,6 @@ public class StudentAndGradeService {
 
 	public void deleteStudent(int id) {
 		if (isStudentFound(id)) {
-			historyGradeDao.deleteByStudentId(id);
-			mathGradeDao.deleteByStudentId(id);
-			scienceGradeDao.deleteByStudentId(id);
-
 			studentDao.deleteById(id);
 		}
 	}

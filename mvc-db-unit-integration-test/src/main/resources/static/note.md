@@ -28,3 +28,14 @@ Use _main/resources/db/create_mysql_database_script_my_version.sql_ to
 - Create db (`spring-testing`)
 - Create tables (`student` `history_grade` `math_grade` `science_grade`)
 - Insert initial data
+
+## EXTRA: Refactor to JPA-Based Model
+Use StudentAndGradeServiceTest#deleteStudentService test to verify the functionality.
+
+### Steps
+1. ✅ Remove inline cascade-on-delete in StudentAndGradeService#deleteStudentService
+2. Set up JPA associations for model classes
+   - CollegeStudent: @OneToMany + cascade-remove
+   - HistoryGrade, MathGrade, ScienceGrade: @ManyToOne
+   - Define convenience methods to make sure both sides are in-sync
+   - Choice: uni- or bi-directional?
