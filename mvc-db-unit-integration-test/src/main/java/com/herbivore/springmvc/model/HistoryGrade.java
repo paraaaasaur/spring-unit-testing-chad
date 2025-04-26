@@ -20,9 +20,6 @@ public class HistoryGrade implements Grade {
     @Column(name = "grade")
     private double grade;
 
-    @Column(name = "student_id")
-    private int studentId;
-
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "student_id")
     @Setter(PROTECTED) @ToString.Exclude
@@ -36,22 +33,15 @@ public class HistoryGrade implements Grade {
     }
 
 
-    public HistoryGrade(int studentId, double grade) {
-        this.studentId = studentId;
-        this.grade = grade;
-    }
-
-
     // #equals and #hashCode
     @Override
     public final boolean equals(Object o) {
         return (o instanceof HistoryGrade that)
-               && this.getId() == that.getId()
-               && this.getStudentId() == that.getStudentId();
+               && this.getId() == that.getId();
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(getId(), getStudentId());
+        return Objects.hash(getId());
     }
 }

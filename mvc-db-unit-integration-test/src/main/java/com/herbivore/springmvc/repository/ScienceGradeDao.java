@@ -4,7 +4,7 @@ import com.herbivore.springmvc.model.ScienceGrade;
 import org.springframework.data.repository.CrudRepository;
 
 public interface ScienceGradeDao extends CrudRepository<ScienceGrade, Integer> {
-	Iterable<ScienceGrade> findGradeByStudentId(int studentId);
+	Iterable<ScienceGrade> findGradesByCollegeStudentId(int studentId);
 
-	void deleteByStudentId(int studentId);
+	void deleteByCollegeStudentId(int studentId);
 }

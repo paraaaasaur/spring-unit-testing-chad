@@ -53,7 +53,8 @@ public class StudentAndGradeService {
 
 	public boolean createGrade(double grade, int studentId, Grade.Type gradeType) {
 		// 1. validate conditions
-		boolean valid = (grade >= 0.0 && grade <= 100.0) && isStudentFound(studentId);
+		CollegeStudent student = studentDao.findById(studentId).orElse(null);
+		boolean valid = (grade >= 0.0 && grade <= 100.0) && (student != null);
 		if (!valid) return false;
 
 		// 2. create grade entity & save to DB
@@ -62,21 +63,21 @@ public class StudentAndGradeService {
 				HistoryGrade historyGrade = new HistoryGrade();
 	//				historyGrade.setId(0);
 					historyGrade.setGrade(grade);
-					historyGrade.setStudentId(studentId);
+					student.associate(historyGrade);
 				historyGradeDao.save(historyGrade);
 			}
 			case MATH -> {
 				MathGrade mathGrade = new MathGrade();
 	//				mathGrade.setId(0);
 					mathGrade.setGrade(grade);
-					mathGrade.setStudentId(studentId);
+					student.associate(mathGrade);
 				mathGradeDao.save(mathGrade);
 			}
 			case SCIENCE -> {
 				ScienceGrade scienceGrade = new ScienceGrade();
 	//				scienceGrade.setId(0);
 					scienceGrade.setGrade(grade);
-					scienceGrade.setStudentId(studentId);
+					student.associate(scienceGrade);
 				scienceGradeDao.save(scienceGrade);
 			}
 			default -> {
@@ -94,7 +95,7 @@ public class StudentAndGradeService {
 		if (gradeType == MATH) {
 			Optional<MathGrade> mathGrade = mathGradeDao.findById(gradeId);
 			if (mathGrade.isPresent()) {
-				studentId = mathGrade.get().getStudentId();
+				studentId = mathGrade.get().getCollegeStudent().getId();
 				mathGradeDao.delete(mathGrade.get());
 			}
 		}
@@ -102,7 +103,7 @@ public class StudentAndGradeService {
 		if (gradeType == SCIENCE) {
 			Optional<ScienceGrade> scienceGrade = scienceGradeDao.findById(gradeId);
 			if (scienceGrade.isPresent()) {
-				studentId = scienceGrade.get().getStudentId();
+				studentId = scienceGrade.get().getCollegeStudent().getId();
 				scienceGradeDao.delete(scienceGrade.get());
 			}
 		}
@@ -110,7 +111,7 @@ public class StudentAndGradeService {
 		if (gradeType == HISTORY) {
 			Optional<HistoryGrade> historyGrade = historyGradeDao.findById(gradeId);
 			if (historyGrade.isPresent()) {
-				studentId = historyGrade.get().getStudentId();
+				studentId = historyGrade.get().getCollegeStudent().getId();
 				historyGradeDao.delete(historyGrade.get());
 			}
 		}
@@ -125,9 +126,9 @@ public class StudentAndGradeService {
 			return null;
 		}
 
-		var historyGradeList = iterToList(historyGradeDao.findGradeByStudentId(studentId));
-		var mathGradeList = iterToList(mathGradeDao.findGradeByStudentId(studentId));
-		var scienceGradeList = iterToList(scienceGradeDao.findGradeByStudentId(studentId));
+		var historyGradeList = iterToList(historyGradeDao.findGradesByCollegeStudentId(studentId));
+		var mathGradeList = iterToList(mathGradeDao.findGradesByCollegeStudentId(studentId));
+		var scienceGradeList = iterToList(scienceGradeDao.findGradesByCollegeStudentId(studentId));
 
 		StudentGrades studentGrades = new StudentGrades();
 		studentGrades.setHistoryGradeResults(historyGradeList);

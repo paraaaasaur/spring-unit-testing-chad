@@ -17,9 +17,6 @@ public class MathGrade implements Grade {
     @Id @GeneratedValue(strategy = IDENTITY)
     private int id;
 
-    @Column(name = "student_id")
-    private int studentId;
-
     @Column(name = "grade")
     private double grade;
 
@@ -35,22 +32,16 @@ public class MathGrade implements Grade {
         this.grade = grade;
     }
 
-    public MathGrade(int studentId, double grade) {
-        this.studentId = studentId;
-        this.grade = grade;
-    }
-
 
     // #equals and #hashCode
     @Override
     public final boolean equals(Object o) {
         return (o instanceof MathGrade that)
-               && this.getId() == that.getId()
-               && this.getStudentId() == that.getStudentId();
+               && this.getId() == that.getId();
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(getId(), getStudentId());
+        return Objects.hash(getId());
     }
 }

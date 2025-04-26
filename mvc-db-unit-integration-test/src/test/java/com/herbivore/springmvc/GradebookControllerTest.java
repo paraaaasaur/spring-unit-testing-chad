@@ -90,10 +90,10 @@ public class GradebookControllerTest {
 
 	@AfterEach
 	void cleanUpAfterTransaction() {
-		jdbcTemplate.execute(deleteStudentSql);
 		jdbcTemplate.execute(deleteHistoryGradeSql);
 		jdbcTemplate.execute(deleteMathGradeSql);
 		jdbcTemplate.execute(deleteScienceGradeSql);
+		jdbcTemplate.execute(deleteStudentSql);
 	}
 
 	/**

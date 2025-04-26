@@ -13,10 +13,6 @@ public interface Grade {
 
     void setId(int id);
 
-    int getStudentId();
-
-    void setStudentId(int studentId);
-
     void setGrade(double grade);
 
 

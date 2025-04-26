@@ -73,11 +73,10 @@ class StudentAndGradeServiceTest {
 
 	@AfterEach
 	void cleanUpAfterTransaction() {
-		jdbcTemplate.execute(deleteStudentSql);
 		jdbcTemplate.execute(deleteHistoryGradeSql);
 		jdbcTemplate.execute(deleteMathGradeSql);
 		jdbcTemplate.execute(deleteScienceGradeSql);
-
+		jdbcTemplate.execute(deleteStudentSql);
 	}
 
 	@DisplayName("TTD for Service & DAO")
@@ -122,9 +121,9 @@ class StudentAndGradeServiceTest {
 
 		studentOp = studentDao.findById(1);
 
-		assertFalse(historyGradeDao.findGradeByStudentId(1).iterator().hasNext());
-		assertFalse(mathGradeDao.findGradeByStudentId(1).iterator().hasNext());
-		assertFalse(scienceGradeDao.findGradeByStudentId(1).iterator().hasNext());
+		assertFalse(historyGradeDao.findGradesByCollegeStudentId(1).iterator().hasNext());
+		assertFalse(mathGradeDao.findGradesByCollegeStudentId(1).iterator().hasNext());
+		assertFalse(scienceGradeDao.findGradesByCollegeStudentId(1).iterator().hasNext());
 
 		assertFalse(studentOp.isPresent(), "Student#1 should've been deleted");
 	}
@@ -156,9 +155,9 @@ class StudentAndGradeServiceTest {
 		assertTrue(studentService.createGrade(80.50, 1, HISTORY));
 
 		// Get all grades with studentId
-		Iterable<MathGrade> mathGrades = mathGradeDao.findGradeByStudentId(1);
-		Iterable<ScienceGrade> scienceGrades = scienceGradeDao.findGradeByStudentId(1);
-		Iterable<HistoryGrade> historyGrades = historyGradeDao.findGradeByStudentId(1);
+		Iterable<MathGrade> mathGrades = mathGradeDao.findGradesByCollegeStudentId(1);
+		Iterable<ScienceGrade> scienceGrades = scienceGradeDao.findGradesByCollegeStudentId(1);
+		Iterable<HistoryGrade> historyGrades = historyGradeDao.findGradesByCollegeStudentId(1);
 
 		// Verify there are grades
 		assertTrue(((Collection<MathGrade>)mathGrades).size() == 2, "Student#1 has math grade");
