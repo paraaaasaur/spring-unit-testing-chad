@@ -13,7 +13,8 @@ function showOrHideGrade(gradeType) {
     }
 }
 
-function deleteStudent(id) {
+function deleteStudent(id, event) {
+    event.stopPropagation();
     if (false) {
         // 1. GET /delete/student/{id} via link
         window.location.href = "/delete/student/" + id;
