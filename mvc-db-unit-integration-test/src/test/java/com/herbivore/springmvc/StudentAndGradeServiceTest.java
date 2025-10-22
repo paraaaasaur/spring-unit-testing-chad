@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
@@ -25,7 +25,8 @@ import java.util.Optional;
 import static com.herbivore.springmvc.model.Grade.Type.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestPropertySource("/application-test.properties")
+//@TestPropertySource("/application-test.properties") // fine-tuner; tweaks or injects specific properties for the test context.
+@ActiveProfiles("test") // for testing environment-specific behavior
 @SpringBootTest
 class StudentAndGradeServiceTest {
 	private final StudentAndGradeService studentService;
