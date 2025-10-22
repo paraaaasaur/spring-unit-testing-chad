@@ -1,12 +1,16 @@
 package com.herbivore.springmvc.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.herbivore.springmvc.exception.ApiException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -26,17 +30,23 @@ public class CollegeStudent {
     @Column(name = "email_address")
     private String emailAddress;
 
-    @OneToMany(mappedBy = "collegeStudent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "collegeStudent", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude @Setter(PROTECTED)
-    private List<HistoryGrade> historyGrades;
+    @BatchSize(size = 100)
+    @JsonManagedReference
+    private Set<HistoryGrade> historyGrades = new HashSet<>();
 
-    @OneToMany(mappedBy = "collegeStudent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "collegeStudent", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude @Setter(PROTECTED)
-    private List<MathGrade> mathGrades;
+    @BatchSize(size = 100)
+    @JsonManagedReference
+    private Set<MathGrade> mathGrades = new HashSet<>();
 
-    @OneToMany(mappedBy = "collegeStudent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "collegeStudent", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude @Setter(PROTECTED)
-    private List<ScienceGrade> scienceGrades;
+    @BatchSize(size = 100)
+    @JsonManagedReference
+    private Set<ScienceGrade> scienceGrades = new HashSet<>();
 
 
     public CollegeStudent() {}
@@ -49,34 +59,14 @@ public class CollegeStudent {
 
 
     // JPA convenience methods
-    public void associate(MathGrade mathGrade) {
-        mathGrade.setCollegeStudent(this);
-        this.mathGrades.add(mathGrade);
+    public void associate(Grade grade) {
+        grade.setCollegeStudent(this);
+        resolveCollection(grade).add(grade);
     }
 
-    public void associate(HistoryGrade historyGrade) {
-        historyGrade.setCollegeStudent(this);
-        this.historyGrades.add(historyGrade);
-    }
-
-    public void associate(ScienceGrade scienceGrade) {
-        scienceGrade.setCollegeStudent(this);
-        this.scienceGrades.add(scienceGrade);
-    }
-
-    public void dissociate(MathGrade mathGrade) {
-        mathGrade.setCollegeStudent(null);
-        mathGrades.remove(mathGrade);
-    }
-
-    public void dissociate(HistoryGrade historyGrade) {
-        historyGrade.setCollegeStudent(null);
-        historyGrades.remove(historyGrade);
-    }
-
-    public void dissociate(ScienceGrade scienceGradeGrade) {
-        scienceGradeGrade.setCollegeStudent(null);
-        scienceGrades.remove(scienceGradeGrade);
+    public void dissociate(Grade grade) {
+        grade.setCollegeStudent(null);
+        resolveCollection(grade).remove(grade);
     }
 
 
@@ -87,6 +77,19 @@ public class CollegeStudent {
 
     public String getFullNameAndEmailAddress() {
         return getFullName() + " " + getEmailAddress();
+    }
+
+
+    // helper methods
+    @SuppressWarnings("unchecked")
+    private <T extends Grade> Set<T> resolveCollection(T grade) {
+        Grade.Subject subject = Grade.Subject.of(grade.getClass());
+        return (Set<T>) switch (subject) {
+			case HISTORY -> this.historyGrades; // Set<HistoryGrade>
+			case MATH -> this.mathGrades;
+			case SCIENCE -> this.scienceGrades;
+			default -> throw new ApiException("Invalid subject: " + subject);
+		};
     }
 
 

@@ -1,13 +1,13 @@
-function showOrHideGrade(gradeType) {
-    if (gradeType === "math") {
+function showOrHideGrade(subject) {
+    if (subject === "math") {
         const x = document.getElementById("mathGrade");
         x.style.display = x.style.display === "none" ? "block" : "none";
     }
-    if (gradeType === "science") {
+    if (subject === "science") {
         const x = document.getElementById("scienceGrade");
         x.style.display = x.style.display === "none" ? "block" : "none";
     }
-    if (gradeType === "history") {
+    if (subject === "history") {
         const x = document.getElementById("historyGrade");
         x.style.display = x.style.display === "none" ? "block" : "none";
     }

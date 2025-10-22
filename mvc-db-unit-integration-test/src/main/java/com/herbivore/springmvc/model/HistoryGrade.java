@@ -1,5 +1,6 @@
 package com.herbivore.springmvc.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,9 +8,7 @@ import lombok.ToString;
 
 import java.util.Objects;
 
-import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PROTECTED;
 
 @Entity @Table(name = "history_grade")
 @Getter @Setter @ToString
@@ -20,9 +19,10 @@ public class HistoryGrade implements Grade {
     @Column(name = "grade")
     private double grade;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne // (fetch = LAZY) // todo: never don't you ever dare to mark LAZY at M side in 1-M🫠
     @JoinColumn(name = "student_id")
-    @Setter(PROTECTED) @ToString.Exclude
+    @ToString.Exclude
+    @JsonBackReference
     private CollegeStudent collegeStudent;
 
 

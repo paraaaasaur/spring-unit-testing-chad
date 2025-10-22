@@ -1,6 +1,12 @@
 package com.herbivore.springmvc;
 
-import com.herbivore.springmvc.model.*;
+import com.herbivore.springmvc.exception.ApiException;
+import com.herbivore.springmvc.exception.GradeNotFoundException;
+import com.herbivore.springmvc.exception.StudentNotFoundException;
+import com.herbivore.springmvc.model.CollegeStudent;
+import com.herbivore.springmvc.model.HistoryGrade;
+import com.herbivore.springmvc.model.MathGrade;
+import com.herbivore.springmvc.model.ScienceGrade;
 import com.herbivore.springmvc.repository.HistoryGradeDao;
 import com.herbivore.springmvc.repository.MathGradeDao;
 import com.herbivore.springmvc.repository.ScienceGradeDao;
@@ -8,21 +14,21 @@ import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.test.context.jdbc.SqlGroup;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
-import static com.herbivore.springmvc.model.Grade.Type.*;
+import static com.herbivore.springmvc.model.Grade.Subject.*;
+import static io.github.paraaaasaur.util.Toolbox.hl;
 import static org.junit.jupiter.api.Assertions.*;
 
 //@TestPropertySource("/application-test.properties") // fine-tuner; tweaks or injects specific properties for the test context.
@@ -55,7 +61,7 @@ class StudentAndGradeServiceTest {
 
 
 	@Autowired
-	protected StudentAndGradeServiceTest(StudentAndGradeService studentService, StudentDao studentDao, JdbcTemplate jdbcTemplate, MathGradeDao mathGradeDao, ScienceGradeDao scienceGradeDao, HistoryGradeDao historyGradeDao) {
+	StudentAndGradeServiceTest(StudentAndGradeService studentService, StudentDao studentDao, JdbcTemplate jdbcTemplate, MathGradeDao mathGradeDao, ScienceGradeDao scienceGradeDao, HistoryGradeDao historyGradeDao) {
 		this.studentService = studentService;
 		this.studentDao = studentDao;
 		this.jdbcTemplate = jdbcTemplate;
@@ -80,41 +86,26 @@ class StudentAndGradeServiceTest {
 		jdbcTemplate.execute(deleteStudentSql);
 	}
 
-	@DisplayName("TTD for Service & DAO")
 	@Test
 	void createStudentService() {
-		CollegeStudent student = studentDao.findByEmailAddress("hi-im-tom@gmail.com");
+		String expected = "tatsunoko@hololive.tv";
 
-		String expected = "hi-im-tom@gmail.com";
-		String actual = student.getEmailAddress();
+		studentService.createStudent("Sorimasen", "Chunks", expected);
+		String actual = studentDao.findByEmailAddress(expected).getEmailAddress();
 
-		assertEquals(expected, actual, "find by email");
+		assertEquals(expected, actual, "Found student's email is " + expected);
 	}
 
-	@DisplayName("TTD for Service#Null-Check")
-	@Test
-	void isStudentFound() {
-		assertTrue(studentService.isStudentFound(1));
-
-		assertFalse(studentService.isStudentFound(0));
-	}
-
-	@Test
+	@Test // extra
 	void testQueryAnnotation() {
 		var students = studentDao.findByEmailAddressLike("%gmail%");
 		System.out.println(students.getClass());
 		students.forEach(System.out::println);
 	}
 
-	/**
-	 * 1. Delete a student<br>
-	 * 2. Establish delete-on-cascade so that deletes
-	 *    all grades from the student as well<br>
-	 **/
-	@DisplayName("TTD for Service#Delete-Student")
 	@Test
 	void deleteStudentService() {
-		Optional<CollegeStudent> studentOp = studentDao.findById(1);
+		var studentOp = studentDao.findById(1);
 
 		assertTrue(studentOp.isPresent(), "Student#1 should exist");
 
@@ -122,107 +113,164 @@ class StudentAndGradeServiceTest {
 
 		studentOp = studentDao.findById(1);
 
-		assertFalse(historyGradeDao.findGradesByCollegeStudentId(1).iterator().hasNext());
-		assertFalse(mathGradeDao.findGradesByCollegeStudentId(1).iterator().hasNext());
-		assertFalse(scienceGradeDao.findGradesByCollegeStudentId(1).iterator().hasNext());
+		assertFalse(historyGradeDao.findAllByCollegeStudentId(1).iterator().hasNext());
+		assertFalse(mathGradeDao.findAllByCollegeStudentId(1).iterator().hasNext());
+		assertFalse(scienceGradeDao.findAllByCollegeStudentId(1).iterator().hasNext());
 
 		assertFalse(studentOp.isPresent(), "Student#1 should've been deleted");
 	}
 
-	@Sql("/insert-data.sql")
-	@DisplayName("TTD for Service#Get-GradeBook")
+	@SqlGroup({
+			@Sql(scripts = "/insert-student.sql", config = @SqlConfig(commentPrefix = "`")),
+			@Sql("/override-data.sql"),
+			@Sql("/insert-grade.sql")}
+	)
 	@Test
-	void getGradeBookService() {
-		Iterable<CollegeStudent> iterableCollegeStudents = studentService.getGradebook();
+	void findAllStudentsWithGrades() {
+		List<CollegeStudent> csList = studentService.findAllStudentsWithGrades();
 
-		List<CollegeStudent> collegeStudents = new ArrayList<>();
+		List<CollegeStudent> csListTest = csList.stream()
+				.filter(cs -> cs.getId() > 10)
+				.toList();
 
-		for (var cs : iterableCollegeStudents) {
-			collegeStudents.add(cs);
-		}
+		assertEquals(4, csListTest.size());
 
-		assertEquals(5, collegeStudents.size());
+		var collegeStudentIdx2 =  csListTest.get(2);
+		var csIdIdx2 = collegeStudentIdx2.getId();
+
+		assertIterableEquals(collegeStudentIdx2.getHistoryGrades(), historyGradeDao.findAllByCollegeStudentId(csIdIdx2));
+		assertIterableEquals(collegeStudentIdx2.getMathGrades(), mathGradeDao.findAllByCollegeStudentId(csIdIdx2));
+		assertIterableEquals(collegeStudentIdx2.getScienceGrades(), scienceGradeDao.findAllByCollegeStudentId(csIdIdx2));
+
+		assertEquals(collegeStudentIdx2, studentDao.findById(csIdIdx2).orElse(null));
+
+
+		var collegeStudentIdx0 = csListTest.get(0);
+		assertNotNull(collegeStudentIdx0.getHistoryGrades());
+		assertNotNull(collegeStudentIdx0.getScienceGrades());
+		assertNotNull(collegeStudentIdx0.getMathGrades());
 	}
 
-	// CH9: Create grade service
-
-	@DisplayName("TTD for Grade Functionality")
 	@Test
 	void createGradeService() {
+		assertTrue(studentDao.existsById(1));
 
 		// Create the grade
-		assertTrue(studentService.createGrade(80.50, 1, MATH));
-		assertTrue(studentService.createGrade(80.50, 1, SCIENCE));
-		assertTrue(studentService.createGrade(80.50, 1, HISTORY));
+		assertNotNull(studentService.createGrade(80.50, 1, MATH));
+		assertNotNull(studentService.createGrade(80.50, 1, SCIENCE));
+		assertNotNull(studentService.createGrade(80.50, 1, HISTORY));
+		assertThrows(ApiException.class, () -> studentService.createGrade(80.50, 1, UNKNOWN));
+
 
 		// Get all grades with studentId
-		Iterable<MathGrade> mathGrades = mathGradeDao.findGradesByCollegeStudentId(1);
-		Iterable<ScienceGrade> scienceGrades = scienceGradeDao.findGradesByCollegeStudentId(1);
-		Iterable<HistoryGrade> historyGrades = historyGradeDao.findGradesByCollegeStudentId(1);
+		var mathGrades = mathGradeDao.findAllByCollegeStudentId(1);
+		var scienceGrades = scienceGradeDao.findAllByCollegeStudentId(1);
+		var historyGrades = historyGradeDao.findAllByCollegeStudentId(1);
 
 		// Verify there are grades
-		assertTrue(((Collection<MathGrade>)mathGrades).size() == 2, "Student#1 has math grade");
-		assertTrue(((Collection<ScienceGrade>)scienceGrades).size() == 2, "Student#1 has science grade");
-		assertTrue(((Collection<HistoryGrade>)historyGrades).size() == 2, "Student#1 has history grade");
+		assertTrue((mathGrades).iterator().hasNext(), "Student#2 has MATH grade");
+		assertTrue((scienceGrades).iterator().hasNext(), "Student#2 has SCIENCE grade");
+		assertTrue((historyGrades).iterator().hasNext(), "Student#2 has HISTORY grade");
 	}
 
-	@DisplayName("Test Edge Cases for Creating Grades")
-	@Test
+	@Test // omitted by Chad
 	void createGradeServiceReturnFalse() {
 		// false grade
-		assertFalse(studentService.createGrade(100.5, 1, MATH));
-		assertFalse(studentService.createGrade(-5.5, 1, MATH));
-		assertFalse(studentService.createGrade(Double.NaN, 1, MATH));
-		assertFalse(studentService.createGrade(Double.POSITIVE_INFINITY, 1, MATH));
-		assertFalse(studentService.createGrade(Double.NEGATIVE_INFINITY, 1, MATH));
+		assertThrows(ApiException.class, () -> studentService.createGrade(100.5, 1, MATH));
+		assertThrows(ApiException.class, () -> studentService.createGrade(-5.5, 1, MATH));
+		assertThrows(ApiException.class, () -> studentService.createGrade(Double.NaN, 1, MATH));
+		assertThrows(ApiException.class, () -> studentService.createGrade(Double.POSITIVE_INFINITY, 1, MATH));
+		assertThrows(ApiException.class, () -> studentService.createGrade(Double.NEGATIVE_INFINITY, 1, MATH));
 
-		// different ids
-		assertFalse(studentService.createGrade(80.5, 2, MATH));
+		// invalid student id
+		assertThrows(StudentNotFoundException.class, () -> studentService.createGrade(80.5, 2, MATH));
 
 		// false subject
-		assertFalse(studentService.createGrade(100.5, 1, UNKNOWN));
+		assertThrows(ApiException.class, () -> studentService.createGrade(58.6, 1, UNKNOWN));
 	}
 
-	@DisplayName("TDD for GradeService#delete-grade")
 	@Test
 	void deleteGradeService() {
-		// Return student id after deletion
-		int studentIdFromMath = studentService.deleteGrade(1, MATH);
-		assertEquals(1, studentIdFromMath);
+		// #deleteGrade returns student id; 0 for failed deletion
+		assertEquals(1, studentService.deleteGrade(1, MATH),
+				"Student#1 has MATH grade created in @BeforeEach");
 
-		int studentIdFromScience = studentService.deleteGrade(1, SCIENCE);
-		assertEquals(1, studentIdFromScience);
+		assertEquals(1, studentService.deleteGrade(1, SCIENCE),
+				"Student#1 has SCIENCE grade created in @BeforeEach");
 
-		int studentIdFromHistory = studentService.deleteGrade(1, HISTORY);
-		assertEquals(1, studentIdFromHistory);
+		assertEquals(1, studentService.deleteGrade(1, HISTORY),
+				"Student#1 has HISTORY grade created in @BeforeEach");
+
+		assertThrows(GradeNotFoundException.class,
+				() -> studentService.deleteGrade(0, SCIENCE),
+				"Student#0 indicates failed deletion");
+
+		assertThrows(ApiException.class,
+				() -> studentService.deleteGrade(1, UNKNOWN),
+				"Student#0 indicates failed deletion");
 	}
 
-	@DisplayName("Edge Cases: Invalid Grade ID for Deleting Grades")
 	@Test
-	void deleteGradeServiceReturnStudentIdOfZero() {
-		assertEquals(0, studentService.deleteGrade(-1, MATH));
+	void findStudentWithGrades() {
+		CollegeStudent foundCs = studentService.findStudentWithGrades(1);
+
+		assertNotNull(foundCs);
+		assertEquals(1, foundCs.getId());
+		assertEquals("Tom", foundCs.getFirstname());
+		assertEquals("Riddle", foundCs.getLastname());
+		assertEquals("hi-im-tom@gmail.com", foundCs.getEmailAddress());
+		assertEquals(1, foundCs.getHistoryGrades().size());
+		assertEquals(1, foundCs.getMathGrades().size());
+		assertEquals(1, foundCs.getScienceGrades().size());
 	}
 
-	@DisplayName("Retrieve Student Information")
 	@Test
-	void studentInformation() {
-		GradesAndCollegeStudent gcs = studentService.studentInformation(1);
+	void findStudentWithGrades_shouldReturnNull_whenUserDoesNotExist() {
+		Executable exe = () -> studentService.findStudentWithGrades(0);
 
-		assertNotNull(gcs);
-		assertEquals(1, gcs.getCollegeStudent().getId());
-		assertEquals("Tom", gcs.getCollegeStudent().getFirstname());
-		assertEquals("Riddle", gcs.getCollegeStudent().getLastname());
-		assertEquals("hi-im-tom@gmail.com", gcs.getCollegeStudent().getEmailAddress());
-		assertEquals(1, gcs.getStudentGrades().getHistoryGradeResults().size());
-		assertEquals(1, gcs.getStudentGrades().getMathGradeResults().size());
-		assertEquals(1, gcs.getStudentGrades().getScienceGradeResults().size());
+		assertThrows(StudentNotFoundException.class, exe);
 	}
 
-	@DisplayName("Edge Case for #studentInformation: Invalid Student")
-	@Test
-	void studentInformationServiceReturnNull() {
-		GradesAndCollegeStudent gcs = studentService.studentInformation(0);
+	@Test // extra
+	void associateAndDissociate() {
+		var newCs = new CollegeStudent("Chili", "Pasta", "cp@gmail.it");
+		var newHg = new HistoryGrade(17.5);
+		var newMg = new MathGrade(18.5);
+		var newSci = new ScienceGrade(19.5);
+		newCs.associate(newHg);
+		newCs.associate(newMg);
+		newCs.associate(newSci);
 
-		assertNull(gcs);
+		int id = studentDao.save(newCs).getId();
+		var foundCs = studentService.findStudentWithGrades(id);
+		System.out.println(foundCs);
+		System.out.println(foundCs.getHistoryGrades());
+		System.out.println(foundCs.getMathGrades());
+		System.out.println(foundCs.getScienceGrades());
+
+		assertEquals(1, foundCs.getHistoryGrades().size());
+		assertEquals(1, foundCs.getMathGrades().size());
+		assertEquals(1, foundCs.getScienceGrades().size());
+
+		hl();
+
+		foundCs.dissociate(foundCs.getHistoryGrades().iterator().next());
+		foundCs.dissociate(foundCs.getMathGrades().iterator().next());
+		foundCs.dissociate(foundCs.getScienceGrades().iterator().next());
+
+
+		studentDao.save(foundCs);
+
+		hl();
+
+		var foundCs2 = studentService.findStudentWithGrades(id);
+		System.out.println(foundCs2);
+		System.out.println(foundCs2.getHistoryGrades());
+		System.out.println(foundCs2.getMathGrades());
+		System.out.println(foundCs2.getScienceGrades());
+
+		assertTrue(foundCs2.getHistoryGrades().isEmpty());
+		assertTrue(foundCs2.getMathGrades().isEmpty());
+		assertTrue(foundCs2.getScienceGrades().isEmpty());
 	}
 }

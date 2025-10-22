@@ -14,9 +14,11 @@ import static io.github.paraaaasaur.util.Toolbox.yellow;
 public class MvcTestingExampleApplication {
 	private static final Logger logger = LoggerFactory.getLogger(MvcTestingExampleApplication.class);
 
+
 	public static void main(String[] args) {
 		SpringApplication.run(MvcTestingExampleApplication.class, args);
 	}
+
 
 	@PostConstruct
 	private void aparecium() {
