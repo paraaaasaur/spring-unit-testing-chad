@@ -1,12 +1,14 @@
 package com.herbivore.springmvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.herbivore.springmvc.model.CollegeStudent;
 import com.herbivore.springmvc.repository.HistoryGradeDao;
 import com.herbivore.springmvc.repository.MathGradeDao;
 import com.herbivore.springmvc.repository.ScienceGradeDao;
 import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,9 +17,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
@@ -88,5 +97,18 @@ class GradebookControllerTest {
 	}
 
 	@Test
-	void placeHolder() {}
+	@Transactional(readOnly = true)
+	void whenGetStudents_ThenReturnStudentsWithGrades() throws Exception {
+		var cs = new CollegeStudent("Paris", "Jackson", "PK@gmail.com");
+		em.setFlushMode(FlushModeType.COMMIT);
+		em.persist(cs);
+//		em.flush();
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/"))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$", hasSize(1 + 1)))
+				.andExpect(jsonPath("$[0].historyGrades", hasSize(1)))
+				.andExpect(jsonPath("$[0].historyGrades[0].grade", is(100.0)));
+	}
 }
