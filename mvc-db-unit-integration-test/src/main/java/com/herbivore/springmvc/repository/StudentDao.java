@@ -13,4 +13,6 @@ public interface StudentDao extends CrudRepository<CollegeStudent, Integer> {
 
 	@Query("SELECT u FROM CollegeStudent u WHERE u.emailAddress LIKE ?1")
 	Set<CollegeStudent> findByEmailAddressLike(String emailAddress);
+
+	boolean existsByEmailAddress(String emailAddress);
 }

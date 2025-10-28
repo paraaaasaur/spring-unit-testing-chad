@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
@@ -110,5 +112,26 @@ class GradebookControllerTest {
 				.andExpect(jsonPath("$", hasSize(1 + 1)))
 				.andExpect(jsonPath("$[0].historyGrades", hasSize(1)))
 				.andExpect(jsonPath("$[0].historyGrades[0].grade", is(100.0)));
+	}
+
+	@Test
+	void whenCreateStudent_thenReturnStudentWithoutGrades() throws Exception {
+		CollegeStudent rawReqBody = new CollegeStudent("Mr", "Poring", "imsocuteayaya@ragnarok.ko");
+		String reqBody = OBJECT_MAPPER.writeValueAsString(rawReqBody);
+		System.out.println(reqBody);
+
+		mockMvc.perform(post("/student")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(reqBody))
+					// trap: params are bad request for application/json.
+					// they are x-www-urlencoded
+//					.param("firstname", "Mr")
+//					.param("lastname", "Poring")
+//					.param("emailAddress", "pf@ragnarok.ko"))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$", hasSize(2)))
+				.andExpect(jsonPath("$[1].lastname", is("Poring")));
+
+		assertTrue(studentDao.existsByEmailAddress("imsocuteayaya@ragnarok.ko"));
 	}
 }
