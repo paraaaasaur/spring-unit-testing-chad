@@ -28,8 +28,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
@@ -149,5 +148,22 @@ class GradebookControllerTest {
 				.andExpect(jsonPath("$", hasSize(0)));
 
 		assertFalse(studentDao.existsById(1));
+	}
+
+	@Test
+	void whenStudentInformation_thenReturnStudentWithGrades() throws Exception {
+		assertTrue(studentDao.existsById(1));
+
+		mockMvc.perform(get("/studentInformation/{id}", 1))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.id", is(1)))
+				.andExpect(jsonPath("$.firstname", is("Tom")))
+				.andExpect(jsonPath("$.lastname", is("Riddle")))
+				.andExpect(jsonPath("$.emailAddress", is("hi-im-tom@gmail.com")))
+				.andExpect(jsonPath("$.historyGrades[0].id", is(1)))
+				.andExpect(jsonPath("$.historyGrades[0].grade", is(100.0)))
+				.andExpect(jsonPath("$.mathGrades[0].grade", is(100.0)))
+				.andExpect(jsonPath("$.scienceGrades[0].grade", is(100.0)));
 	}
 }
