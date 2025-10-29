@@ -206,4 +206,22 @@ class GradebookControllerTest {
 		assertTrue(scienceGradeDao.existsById(2));
 		assertEquals(2, ((List<ScienceGrade>) scienceGradeDao.findAll()).size());
 	}
+
+	@Test
+	void givenInvalidStudentId_whenCreateGrade_thenTriggersStudentNotFoundException() throws Exception {
+		assertFalse(studentDao.existsById(0));
+		assertEquals(1, ((List<ScienceGrade>) scienceGradeDao.findAll()).size());
+
+		mockMvc.perform(post("/grades")
+						.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+						.param("subject", "ScIeNcE")
+						.param("grade", "66.99")
+						.param("studentId", "0"))
+				.andExpect(status().isNotFound())
+				.andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+				.andExpect(jsonPath("$.detail", is("Student#0 not found")))
+				.andDo(print());
+
+		assertEquals(1, ((List<ScienceGrade>) scienceGradeDao.findAll()).size());
+	}
 }
