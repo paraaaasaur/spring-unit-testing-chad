@@ -2,6 +2,7 @@ package com.herbivore.springmvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.herbivore.springmvc.model.CollegeStudent;
+import com.herbivore.springmvc.model.ScienceGrade;
 import com.herbivore.springmvc.repository.HistoryGradeDao;
 import com.herbivore.springmvc.repository.MathGradeDao;
 import com.herbivore.springmvc.repository.ScienceGradeDao;
@@ -24,11 +25,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
@@ -176,5 +179,31 @@ class GradebookControllerTest {
 				.andExpect(status().isNotFound())
 				.andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
 				.andExpect(jsonPath("$.detail", is("Student#0 not found")));
+	}
+
+	@Test
+	void whenCreateGrade_thenReturnStudentWithGrades() throws Exception {
+		// student exists, sc-grade number, sc-grade not created
+		assertTrue(studentDao.existsById(1));
+		assertEquals(1, ((List<ScienceGrade>) scienceGradeDao.findAll()).size());
+		assertFalse(scienceGradeDao.existsById(2));
+
+		// representation
+		mockMvc.perform(post("/grades")
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("subject", "ScIeNcE")
+				.param("grade", "66.99")
+				.param("studentId", "1"))
+				.andExpect(status().isCreated())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.id", is(1)))
+				.andExpect(jsonPath("$.scienceGrades", hasSize(2)))
+				.andExpect(jsonPath("$.scienceGrades[1].id", is(2)))
+				.andExpect(jsonPath("$.scienceGrades[1].grade", is(66.99)))
+				.andDo(print());
+
+		// verify db
+		assertTrue(scienceGradeDao.existsById(2));
+		assertEquals(2, ((List<ScienceGrade>) scienceGradeDao.findAll()).size());
 	}
 }
