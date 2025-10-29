@@ -22,8 +22,10 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 
@@ -223,5 +225,25 @@ class GradebookControllerTest {
 				.andDo(print());
 
 		assertEquals(1, ((List<ScienceGrade>) scienceGradeDao.findAll()).size());
+	}
+
+	@Test
+	void givenInvalidSubject_whenCreateGrade_thenRespond400() throws Exception {
+		assertTrue(studentDao.existsById(1));
+
+		MvcResult mvcResult = mockMvc.perform(post("/grades")
+						.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+						.param("subject", "tai-chi")
+						.param("grade", "66.99")
+						.param("studentId", "1"))
+				.andExpect(status().isBadRequest())
+				// not handled by my GlobalErrorHandler
+				// can override method if one wishes
+				.andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+				.andExpect(jsonPath("$.title", is("Bad Request")))
+				.andExpect(jsonPath("$.detail", is("Invalid subject 'tai-chi'")))
+				.andReturn();
+
+		assertSame(MethodArgumentTypeMismatchException.class, mvcResult.getResolvedException().getClass());
 	}
 }
