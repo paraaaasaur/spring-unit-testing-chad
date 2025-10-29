@@ -1,5 +1,6 @@
 package com.herbivore.springmvc.service;
 
+import com.herbivore.springmvc.dto.CollegeStudentDto;
 import com.herbivore.springmvc.exception.ApiException;
 import com.herbivore.springmvc.exception.GradeNotFoundException;
 import com.herbivore.springmvc.exception.StudentNotFoundException;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -124,6 +126,22 @@ public class StudentAndGradeService {
 		found.getScienceGrades().size();
 
 		return found;
+	}
+
+
+	// domain mapping methods
+	// fixme: not tested
+	public List<CollegeStudentDto> findAllStudentDtos() {
+		List<CollegeStudentDto> dtos = new ArrayList<>();
+		for (CollegeStudent cs : studentDao.findAll()) {
+			dtos.add(new CollegeStudentDto(
+					cs.getId(),
+					cs.getFirstname(),
+					cs.getLastname(),
+					cs.getEmailAddress()
+			));
+		}
+		return dtos;
 	}
 
 

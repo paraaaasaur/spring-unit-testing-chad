@@ -273,4 +273,20 @@ class StudentAndGradeServiceTest {
 		assertTrue(foundCs2.getMathGrades().isEmpty());
 		assertTrue(foundCs2.getScienceGrades().isEmpty());
 	}
+
+	@Test
+	void whenFindAllStudentDtos_thenReturnStudentDtos() {
+		var dtoList = studentService.findAllStudentDtos();
+		var csList = (List<CollegeStudent>) studentDao.findAll();
+
+		assertEquals(dtoList.size(), csList.size());
+
+		for (var dto : dtoList) {
+			var cs = csList.iterator().next();
+			assertEquals(dto.id(), cs.getId());
+			assertEquals(dto.firstname(), cs.getFirstname());
+			assertEquals(dto.lastname(), cs.getLastname());
+			assertEquals(dto.emailAddress(), cs.getEmailAddress());
+		}
+	}
 }

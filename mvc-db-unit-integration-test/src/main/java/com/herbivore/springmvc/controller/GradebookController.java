@@ -1,5 +1,6 @@
 package com.herbivore.springmvc.controller;
 
+import com.herbivore.springmvc.dto.CollegeStudentDto;
 import com.herbivore.springmvc.model.CollegeStudent;
 import com.herbivore.springmvc.model.Grade;
 import com.herbivore.springmvc.service.StudentAndGradeService;
@@ -32,20 +33,20 @@ public class GradebookController {
 
 	@PostMapping("/student")
 	@ResponseStatus(HttpStatus.CREATED)
-	public List<CollegeStudent> createStudent(@RequestBody CollegeStudent newStudent) {
+	public List<CollegeStudentDto> createStudent(@RequestBody CollegeStudent newStudent) {
 		studentAndGradeService.createStudent(
 				newStudent.getFirstname(),
 				newStudent.getLastname(),
 				newStudent.getEmailAddress()
 		);
-		return studentAndGradeService.findAllStudentsWithGrades();
+		return studentAndGradeService.findAllStudentDtos();
 	}
 
 	@DeleteMapping("/student/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public List<CollegeStudent> deleteStudent(@PathVariable int id) {
+	public List<CollegeStudentDto> deleteStudent(@PathVariable int id) {
 		studentAndGradeService.deleteStudent(id);
-		return studentAndGradeService.findAllStudentsWithGrades();
+		return studentAndGradeService.findAllStudentDtos();
 	}
 
 	@PostMapping("/grades")
