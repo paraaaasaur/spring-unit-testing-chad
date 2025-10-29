@@ -166,4 +166,15 @@ class GradebookControllerTest {
 				.andExpect(jsonPath("$.mathGrades[0].grade", is(100.0)))
 				.andExpect(jsonPath("$.scienceGrades[0].grade", is(100.0)));
 	}
+
+	@Test
+	void givenInvalidId_whenStudentInformation_thenTriggersStudentNotFoundException() throws Exception {
+		assertFalse(studentDao.existsById(0));
+
+		mockMvc.perform(get("/studentInformation/{id}", 0))
+				// behaviors from GlobalErrorhandler#handleStudentNotFound
+				.andExpect(status().isNotFound())
+				.andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+				.andExpect(jsonPath("$.detail", is("Student#0 not found")));
+	}
 }
