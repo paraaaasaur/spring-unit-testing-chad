@@ -246,4 +246,24 @@ class GradebookControllerTest {
 
 		assertSame(MethodArgumentTypeMismatchException.class, mvcResult.getResolvedException().getClass());
 	}
+
+
+	// fixme
+	// mark fetchType = LAZY on the M side in a 1-M relationship, and
+	// then you'll spend half a day finding out you shouldn't have done so
+	@Test
+	void whenDeleteGrade_thenReturnStudentWithGrades() throws Exception {
+		assertTrue(studentDao.existsById(1));
+		assertTrue(historyGradeDao.existsById(1));
+
+		mockMvc.perform(delete("/grades/{id}/{subject}", 1, "hisTory"))
+				.andExpect(status().isNoContent())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.id", is(1)))
+				.andExpect(jsonPath("$.historyGrades", hasSize(0)))
+				.andDo(print());
+
+
+		assertFalse(historyGradeDao.existsById(1));
+	}
 }
