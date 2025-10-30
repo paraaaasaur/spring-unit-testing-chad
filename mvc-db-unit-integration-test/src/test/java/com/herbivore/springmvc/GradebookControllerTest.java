@@ -279,4 +279,22 @@ class GradebookControllerTest {
 
 		assertInstanceOf(GradeNotFoundException.class, mvcResult.getResolvedException());
 	}
+
+	@Test
+	void givenInvalidSubject_whenDeleteGrade_thenReturn400() throws Exception {
+		MvcResult mvcResult = mockMvc
+				// req
+				.perform(delete("/grades/{id}/{subject}", 1, "Brazilian Jiu-Jitsu"))
+				// resp
+				.andExpect(status().isBadRequest())
+				.andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+				.andExpect(jsonPath("$.title", is("Bad Request")))
+				.andExpect(jsonPath("$.detail", is("Invalid subject 'Brazilian Jiu-Jitsu'")))
+				.andReturn();
+
+		assertInstanceOf(
+				MethodArgumentTypeMismatchException.class,
+				mvcResult.getResolvedException()
+		);
+	}
 }
