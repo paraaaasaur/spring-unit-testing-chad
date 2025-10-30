@@ -12,8 +12,10 @@ import com.herbivore.springmvc.repository.MathGradeDao;
 import com.herbivore.springmvc.repository.ScienceGradeDao;
 import com.herbivore.springmvc.repository.StudentDao;
 import com.herbivore.springmvc.service.StudentAndGradeService;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.jdbc.SqlGroup;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,6 +44,7 @@ class StudentAndGradeServiceTest {
 	private final MathGradeDao mathGradeDao;
 	private final ScienceGradeDao scienceGradeDao;
 	private final HistoryGradeDao historyGradeDao;
+	private final EntityManager em;
 
 	@Value("${sql.script.create.student}")
 	private String createStudentSql;
@@ -61,13 +65,14 @@ class StudentAndGradeServiceTest {
 
 
 	@Autowired
-	StudentAndGradeServiceTest(StudentAndGradeService studentService, StudentDao studentDao, JdbcTemplate jdbcTemplate, MathGradeDao mathGradeDao, ScienceGradeDao scienceGradeDao, HistoryGradeDao historyGradeDao) {
+	StudentAndGradeServiceTest(StudentAndGradeService studentService, StudentDao studentDao, JdbcTemplate jdbcTemplate, MathGradeDao mathGradeDao, ScienceGradeDao scienceGradeDao, HistoryGradeDao historyGradeDao, EntityManager em) {
 		this.studentService = studentService;
 		this.studentDao = studentDao;
 		this.jdbcTemplate = jdbcTemplate;
 		this.mathGradeDao = mathGradeDao;
 		this.scienceGradeDao = scienceGradeDao;
 		this.historyGradeDao = historyGradeDao;
+		this.em = em;
 	}
 
 	@BeforeEach
@@ -288,5 +293,30 @@ class StudentAndGradeServiceTest {
 			assertEquals(dto.lastname(), cs.getLastname());
 			assertEquals(dto.emailAddress(), cs.getEmailAddress());
 		}
+	}
+
+	@Test
+	@DisplayName("#1")
+	void deleteThenFind() {
+		int studentId = studentService.deleteGrade(1, SCIENCE);
+		var cs = studentService.findStudentWithGrades(studentId);
+		assertEquals(1, cs.getHistoryGrades().size());
+		assertEquals(1, cs.getMathGrades().size());
+		assertEquals(0, cs.getScienceGrades().size());
+	}
+
+	@Test
+	@DisplayName("#2")
+	@Transactional
+	void deleteThenFind2() {
+		int studentId = studentService.deleteGrade(1, SCIENCE);
+		em.flush(); // !!
+		var cs = studentService.findStudentWithGrades(studentId);
+		assertEquals(1, cs.getHistoryGrades().size());
+		assertEquals(1, cs.getMathGrades().size());
+		// without em.flush(), transaction boundary disappears
+		// since both transactions join the one bigger, 
+		// explicit @Transactional annotated on this test
+		assertEquals(0, cs.getScienceGrades().size());
 	}
 }
