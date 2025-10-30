@@ -1,6 +1,7 @@
 package com.herbivore.springmvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.herbivore.springmvc.exception.GradeNotFoundException;
 import com.herbivore.springmvc.model.CollegeStudent;
 import com.herbivore.springmvc.model.ScienceGrade;
 import com.herbivore.springmvc.repository.HistoryGradeDao;
@@ -265,5 +266,17 @@ class GradebookControllerTest {
 
 
 		assertFalse(historyGradeDao.existsById(1));
+	}
+
+	@Test
+	void givenInvalidGradeId_whenDeleteGrade_thenReturn404() throws Exception {
+		assertFalse(mathGradeDao.existsById(69));
+
+		MvcResult mvcResult = mockMvc.perform(delete("/grades/{id}/{subject}", 69, "mAtH"))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.detail", is("MathGrade#69 not found")))
+				.andReturn();
+
+		assertInstanceOf(GradeNotFoundException.class, mvcResult.getResolvedException());
 	}
 }
